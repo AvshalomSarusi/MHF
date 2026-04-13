@@ -16,7 +16,9 @@ function createProfile(req, res) {
             return res.status(500).send("DB error");
         }
 
-        res.send("User created successfully");
+        setTimeout(() => {
+            res.redirect('/');
+        }, 2000);
     });
 }
 
