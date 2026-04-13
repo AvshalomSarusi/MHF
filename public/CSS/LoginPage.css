@@ -1,0 +1,28 @@
+body {
+    margin: 0;
+    height: 100vh; /* גובה של כל המסך */
+    /*display: flex;*/
+    justify-content: center; /* ממרכז אופקית */
+    align-items: center; /* ממרכז אנכית */
+}
+h1{
+    text-align: center;
+}
+#input {
+    text-align: center; /* יישור תוכן הטקסט במרכז */
+}
+
+input {
+    padding: 5px;
+    margin: 10px 0; /* רווח בין האינפוטים */
+    text-align: center;
+}
+button{
+    border: solid , 2px , lightskyblue;
+}
+
+#createAccount {
+    position: absolute; /* מניח את הכפתור בצורה מוחלטת */
+    top: 20px; /* מציב את הכפתור בחלק העליון */
+    right: 20px; /* מציב את הכפתור בצד ימין של המסך */
+}
