@@ -7,6 +7,7 @@ const router = express();
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 const LogDir = router.use(express.static(path.join(__dirname,'..','public')));
+const userController = require('../controller/userController');
 
 router.listen(port, () => {
     console.log(`Server is lesten http://localhost:${port}`);
@@ -57,3 +58,6 @@ router.post('/', (req, res) => {
         }
     });
 });
+
+// יצירת פרופיל חדש 
+router.post('/register',userController.createUser);
