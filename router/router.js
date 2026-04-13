@@ -39,7 +39,7 @@ router.post('/', (req, res) => {
     // שאלה לדאטאבייס כדי לבדוק אם יש את המשתמש עם הסיסמה הזו
 
     console.log({nickname});
-    const query = `SELECT * FROM users WHERE username = '${nickname}' AND password = '${pass}'`;
+    const query = `SELECT * FROM users WHERE firstname = '${nickname}' AND password = '${pass}'`;
 
     db.query(query, (err, results) => {
         if (err) {
