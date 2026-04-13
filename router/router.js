@@ -59,5 +59,6 @@ router.post('/', (req, res) => {
     });
 });
 
+
 // יצירת פרופיל חדש 
-router.post('/register',userController.createUser);
+router.post('/register', userController.createProfile);
