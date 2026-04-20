@@ -2,6 +2,16 @@ const btn = document.getElementById("createRelative");
 const table = document.getElementById("relativeTable");
 const body = document.getElementById("tableBody");
 
+//הבאת נתונים מהדאטה בייס עבר המשתמש
+fetch('/getUser')
+.then(res => res.json())
+.then(data => {
+    document.getElementById("hello").innerText = "Hello " + data.firstname+".";
+})
+.catch(err => {
+    console.log(err);
+});
+
 //כשלוחצים על הכפטור ליצירת ילד או בן משפחה אחר
 btn.addEventListener("click",()=>{
     table.style.display = "table";
@@ -15,7 +25,7 @@ btn.addEventListener("click",()=>{
     body.appendChild(row);
 });
 
-function saveChild(btn) {
+function saveChild(btn) {//מכיל את האלמנט של הכפטור הספציפי (this).
     const row = btn.parentNode.parentNode;
     const name = row.children[0].children[0].value;
 
@@ -29,14 +39,4 @@ function saveChild(btn) {
         console.log(data);
     });
     table.style.display="none";
-}
-//הבאת נתונים מהדאטה בייס עבר המשתמש
-fetch('/getUser')
-.then(res => res.json())
-.then(data => {
-    document.getElementById("hello").innerText = "Hello " + data.firstname+".";
-})
-.catch(err => {
-    console.log(err);
-});
-
+};
