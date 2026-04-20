@@ -84,3 +84,23 @@ router.get('/getUser', (req, res) => {
 
 // יצירת פרופיל חדש 
 router.post('/register', userController.createProfile);
+
+//הכנסת ילד או בן משפחה אחר לדאטה בייס
+router.post('/addChild', (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+        return res.send("Name is required");
+    }
+
+    const sql = `INSERT INTO childe (name) VALUES ('${name}')`;
+
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+            return res.send("DB error");
+        }
+        console.log({name})
+        res.send("Child added successfully");
+    });
+});

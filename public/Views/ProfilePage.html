@@ -4,12 +4,26 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta charset="UTF-8">
-        
+
         <title>MHLProfile</title>
 
     </head>
     <body>
-        <h5 id="hello"></h5>
+        <h2 id="hello"></h2><br>
+        <!--כפטור ליצרת ילד או בן משפחה-->
+        <button id="createRelative">Create relative</button>
+
+        <!-- טבלה להכנסת ילד או בן משפחה-->
+        <table id="relativeTable" border="1" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Child Name</th>
+                    <th>Save</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+
         <script src="JS/profile.js"></script>
     </body>
 </html>
