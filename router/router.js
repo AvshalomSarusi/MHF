@@ -9,10 +9,18 @@ router.use(express.urlencoded({ extended: true }));
 const LogDir = router.use(express.static(path.join(__dirname,'..','public')));
 const userController = require('../controller/userController');
 
+let currentUser = null;
+
 router.listen(port, () => {
     console.log(`Server is lesten http://localhost:${port}`);
     
 });
+
+// דף הפרופיל
+router.get('/p',(req,res)=>{
+    res.sendFile(path.join(__dirname,'..','public','Views','ProfilePage.html'));
+});
+
 // דף ההרשמה
 router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'Register.html'));
@@ -48,8 +56,9 @@ router.post('/', (req, res) => {
         }
 
         if (results.length > 0) {
-            // אם יש תוצאה, המשתמש קיים והסיסמה נכונה
-            res.send("Connected successfully.");
+            // אם יש תוצאה, המשתמש קיים והסיסמה נכונה ניקת את השם משתמש ונברך אותו בברכת שלום
+            
+            res.redirect('/p');
             //alert("Connected successfully.");
         } else {
             // אם אין תוצאה, שם המשתמש או הסיסמה לא נכונים
