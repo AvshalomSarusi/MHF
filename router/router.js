@@ -45,7 +45,6 @@ router.post('/', (req, res) => {
     const { nickname, pass } = req.body;
 
     // שאלה לדאטאבייס כדי לבדוק אם יש את המשתמש עם הסיסמה הזו
-
     console.log({nickname});
     const query = `SELECT * FROM users WHERE firstname = '${nickname}' AND password = '${pass}'`;
 
@@ -57,16 +56,31 @@ router.post('/', (req, res) => {
 
         if (results.length > 0) {
             // אם יש תוצאה, המשתמש קיים והסיסמה 
+            currentUser = results[0];
             res.redirect('/p');
-            //alert("Connected successfully.");
         } else {
             // אם אין תוצאה, שם המשתמש או הסיסמה לא נכונים
             res.send("Incorrect username or password.");
-            //alert("Incorrect username or password.");
         }
     });
 });
 
+//הדאטה בייס מחזיר את פרטי המשתמש המחובר
+router.get('/getUser', (req, res) => {
+    if (!currentUser) {
+        return res.status(401).send("Not logged in");
+    }
+
+    const sql = `SELECT firstname FROM users WHERE id = ${currentUser.id}`;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).send("DB error");
+        }
+
+        res.json(results[0]); 
+    });
+});
 
 // יצירת פרופיל חדש 
 router.post('/register', userController.createProfile);
