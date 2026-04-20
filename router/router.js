@@ -56,8 +56,7 @@ router.post('/', (req, res) => {
         }
 
         if (results.length > 0) {
-            // אם יש תוצאה, המשתמש קיים והסיסמה נכונה ניקת את השם משתמש ונברך אותו בברכת שלום
-            
+            // אם יש תוצאה, המשתמש קיים והסיסמה 
             res.redirect('/p');
             //alert("Connected successfully.");
         } else {

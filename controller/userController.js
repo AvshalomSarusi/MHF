@@ -23,5 +23,5 @@ function createProfile(req, res) {
 }
 
 module.exports = {
-    createProfile   // אותו שם בדיוק
+    createProfile   
 };
