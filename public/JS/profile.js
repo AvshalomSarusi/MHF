@@ -70,3 +70,36 @@ window.onload = function () {
         })
         .catch(err => console.log(err));
 };
+
+//בחירת בן משפחה 
+fetch('/getChildren')
+    .then(res => res.json())
+    .then(data => {
+        const select = document.getElementById("childSelect");
+
+        data.forEach(child => {
+            const option = document.createElement("option");
+            option.value = child.id;
+            option.textContent = child.name;
+            select.appendChild(option);
+        });
+    });
+
+    //הוספת תרופה 
+    document.getElementById("addMedication").onclick = () => {
+
+        const child_id = document.getElementById("childSelect").value;
+        const medication = document.getElementById("medicationName").value;
+        const dosage = document.getElementById("dosage").value;
+    
+        fetch('/addMedication', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ child_id, medication, dosage })
+        })
+        .then(res => res.text())
+        .then(msg => {
+            alert(msg);
+            location.reload();
+        });
+    };

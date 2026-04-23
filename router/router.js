@@ -143,3 +143,47 @@ router.get('/testMailer', (req, res) => {
     )
     res.send("Mail sent");
 });
+
+// בחירת בן משפחה 
+router.get('/getChildren', (req, res) => {
+    const sql = `SELECT id, name FROM childe`;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB error");
+        }
+        res.json(results);
+    });
+});
+
+// הוספת תרופה 
+router.post('/addMedication', (req, res) => {
+
+    const { child_id, medication, dosage } = req.body;
+
+    // קודם נכניס/נמצא תרופה
+    const findOrInsert = `
+        INSERT INTO medications (name)
+        VALUES ('${medication}')
+        ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)
+    `;
+
+    db.query(findOrInsert, (err, result) => {
+        if (err) return res.send("DB error");
+
+        const medication_id = result.insertId;
+
+        const insertLog = `
+            INSERT INTO linkingtable
+            (child_id, medication_id, given_by, mail_sent_at, dosage)
+            VALUES (${child_id}, ${medication_id}, 1, NOW(), '${dosage}')
+        `;
+
+        db.query(insertLog, (err2) => {
+            if (err2) return res.send("Insert error");
+
+            res.send("Medication added");
+        });
+    });
+});
