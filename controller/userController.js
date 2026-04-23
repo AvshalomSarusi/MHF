@@ -15,6 +15,39 @@ function createProfile(req, res) {
             console.log(err);
             return res.status(500).send("DB error");
         }
+        
+        sendMail(
+            req.body.email,
+            "Welcome to MHF",
+            `Hello,
+        
+        Welcome to MHF.
+        
+        Your account has been created successfully.
+        You can now log in and start using the system.
+        
+        We wish you a smooth and helpful experience.
+        
+        Thank you,
+        MHF Team
+        
+        
+        ------------------------
+        
+        ,שלום
+        
+        .MHFברוך הבא ל־ 
+        
+        .החשבון שלך נוצר בהצלחה 
+        .כעת ניתן להתחבר ולהתחיל להשתמש במערכת 
+        
+        .מאחלים לך שימוש נוח ומועיל 
+        
+        ,תודה 
+        MHF צוות `
+        );
+    
+        res.send("User created");
 
         setTimeout(() => {
             res.redirect('/');

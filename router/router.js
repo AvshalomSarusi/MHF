@@ -6,7 +6,7 @@ const port = 3002;
 const router = express();
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
-const LogDir = router.use(express.static(path.join(__dirname,'..','public')));
+const LogDir = router.use(express.static(path.join(__dirname, '..', 'public')));
 const userController = require('../controller/userController');
 const sendMail = require('../public/JS/mailer');
 
@@ -14,19 +14,19 @@ let currentUser = null;
 
 router.listen(port, () => {
     console.log(`Server is lesten http://localhost:${port}`);
-    
+
 });
 
 // דף הפרופיל
-router.get('/p',(req,res)=>{
-    res.sendFile(path.join(__dirname,'..','public','Views','ProfilePage.html'));
+router.get('/p', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'ProfilePage.html'));
 });
 
 // דף ההרשמה
 router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'Register.html'));
-  });
-  
+});
+
 //חיבור הדאטה
 db.connect((err) => {
     if (err) {
@@ -38,7 +38,7 @@ db.connect((err) => {
 
 //הצגת דף הכניסה שלי
 router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname,'..','public','Views', 'LoginPage.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'LoginPage.html'));
 });
 
 //בודק שם המשתמש והסיסמא מול הדאטה בייס
@@ -46,7 +46,7 @@ router.post('/', (req, res) => {
     const { nickname, pass } = req.body;
 
     // שאלה לדאטאבייס כדי לבדוק אם יש את המשתמש עם הסיסמה הזו
-    console.log({nickname});
+    console.log({ nickname });
     const query = `SELECT * FROM users WHERE firstname = '${nickname}' AND password = '${pass}'`;
 
     db.query(query, (err, results) => {
@@ -79,7 +79,7 @@ router.get('/getUser', (req, res) => {
             return res.status(500).send("DB error");
         }
 
-        res.json(results[0]); 
+        res.json(results[0]);
     });
 });
 
@@ -101,16 +101,16 @@ router.post('/addChild', (req, res) => {
             console.log(err);
             return res.send("DB error");
         }
-        console.log({name})
+        console.log({ name })
         res.send("Child added successfully");
     });
 });
 
 //בדיקה שהכול עובד נכון עם שליחת האימיילים
-router.get('/testMailer',(req,res)=>{
+router.get('/testMailer', (req, res) => {
 
     sendMail(
-        "shlomi19880@gmail.com",
+        "myEmail@gmail.com",
         "Test from MHF",
         "It worked"
     )
