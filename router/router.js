@@ -8,6 +8,7 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 const LogDir = router.use(express.static(path.join(__dirname,'..','public')));
 const userController = require('../controller/userController');
+const sendMail = require('../public/JS/mailer');
 
 let currentUser = null;
 
@@ -104,3 +105,14 @@ router.post('/addChild', (req, res) => {
         res.send("Child added successfully");
     });
 });
+
+//בדיקה שהכול עובד נכון עם שליחת האימיילים
+router.get('/testMailer',(req,res)=>{
+
+    sendMail(
+        "shlomi19880@gmail.com",
+        "Test from MHF",
+        "It worked"
+    )
+    res.send("Mail sent");
+})
