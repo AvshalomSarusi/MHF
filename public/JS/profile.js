@@ -1,6 +1,6 @@
 const btn = document.getElementById("createRelative");
 const table = document.getElementById("relativeTable");
-const body = document.getElementById("tableBody");
+const body = document.getElementById("relativeTableBody");
 
 //הבאת נתונים מהדאטה בייס עבר המשתמש
 fetch('/getUser')
@@ -39,4 +39,34 @@ function saveChild(btn) {//מכיל את האלמנט של הכפטור הספצ
         console.log(data);
     });
     table.style.display="none";
+};
+
+//טבלת בן משפחה ותרופות 
+window.onload = function () {
+
+    fetch('/getLogs')
+        .then(res => res.json())
+        .then(data => {
+
+            const table = document.getElementById("logsTableBody");
+
+            table.innerHTML = "";
+
+            data.forEach(row => {
+
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+                    <td>${row.child_name}</td>
+                    <td>${row.medication_name}</td>
+                    <td>${row.dosage || ''}</td>
+                    <td>${row.given_by}</td>
+                    <td>${row.mail_sent_at || ''}</td>
+                    <td>${row.given_at || 'Pending'}</td>
+                `;
+
+                table.appendChild(tr);
+            });
+        })
+        .catch(err => console.log(err));
 };

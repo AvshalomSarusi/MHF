@@ -22,6 +22,33 @@ router.get('/p', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'ProfilePage.html'));
 });
 
+router.get('/getLogs', (req, res) => {
+
+    const sql = `
+    SELECT 
+        c.name AS child_name,
+        m.name AS medication_name,
+        u.firstname AS given_by,
+        l.mail_sent_at,
+        l.given_at,
+        l.dosage
+    FROM linkingtable l
+    JOIN childe c ON l.child_id = c.id
+    JOIN medications m ON l.medication_id = m.id
+    JOIN users u ON l.given_by = u.id
+`;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB error");
+        }
+
+        res.json(results);
+    });
+    console.log("GET LOGS RUNNING");
+});
+
 // דף ההרשמה
 router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'Register.html'));
@@ -115,4 +142,4 @@ router.get('/testMailer', (req, res) => {
         "It worked"
     )
     res.send("Mail sent");
-})
+});
