@@ -1,4 +1,6 @@
 const db = require('../dbConfig');
+const messages = require('../public/JS/message');
+const sendMail = require('../public/JS/mailer');
 
 function createProfile(req, res) {
     const { name, last, email, pass } = req.body;
@@ -16,35 +18,12 @@ function createProfile(req, res) {
             return res.status(500).send("DB error");
         }
         
+        const msg = messages.welcome(name);
+
         sendMail(
-            req.body.email,
-            "Welcome to MHF",
-            `Hello,
-        
-        Welcome to MHF.
-        
-        Your account has been created successfully.
-        You can now log in and start using the system.
-        
-        We wish you a smooth and helpful experience.
-        
-        Thank you,
-        MHF Team
-        
-        
-        ------------------------
-        
-        ,שלום
-        
-        .MHFברוך הבא ל־ 
-        
-        .החשבון שלך נוצר בהצלחה 
-        .כעת ניתן להתחבר ולהתחיל להשתמש במערכת 
-        
-        .מאחלים לך שימוש נוח ומועיל 
-        
-        ,תודה 
-        MHF צוות `
+            email,
+            msg.subject,
+            msg.text
         );
     
         res.send("User created");
