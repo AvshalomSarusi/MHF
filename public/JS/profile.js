@@ -86,20 +86,70 @@ fetch('/getChildren')
     });
 
     //הוספת תרופה 
-    document.getElementById("addMedication").onclick = () => {
-
-        const child_id = document.getElementById("childSelect").value;
-        const medication = document.getElementById("medicationName").value;
-        const dosage = document.getElementById("dosage").value;
+    const medBtn = document.getElementById("createMedication");
+    const medTable = document.getElementById("medicationTable");
+    const medBody = document.getElementById("medicationTableBody");
     
-        fetch('/addMedication', {
+    medBtn.addEventListener("click", () => {
+    
+        medTable.style.display = "table";
+    
+        const row = document.createElement("tr");
+    
+        row.innerHTML = `
+            <td><input type="text" placeholder="Medication name"></td>
+            <td>
+                <select>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </td>
+            <td><button onclick="saveMedication(this)">Save</button></td>
+        `;
+    
+        medBody.appendChild(row);
+    });
+
+    window.saveMedication = function(btn) {
+
+        const row = btn.parentNode.parentNode;
+    
+        const name = row.children[0].children[0].value;
+        const antibiotic = row.children[1].children[0].value;
+    
+        if (!name) {
+            alert("Enter medication name");
+            return;
+        }
+    
+        fetch('/addMedicationType', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ child_id, medication, dosage })
+            body: JSON.stringify({ name, antibiotic })
         })
         .then(res => res.text())
         .then(msg => {
+            console.log("SERVER:", msg);
             alert(msg);
             location.reload();
+        })
+        .catch(err => {
+            console.log("ERROR:", err);
         });
     };
+
+    //הצגת התרופות בבחירה
+    fetch('/getMedications')
+    .then(res => res.json())
+    .then(data => {
+
+        const select = document.getElementById("medicationSelect");
+
+        data.forEach(med => {
+            const option = document.createElement("option");
+            option.value = med.id;
+            option.textContent = med.name;
+            select.appendChild(option);
+        });
+
+    });

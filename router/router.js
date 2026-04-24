@@ -160,7 +160,7 @@ router.get('/getChildren', (req, res) => {
 // הוספת תרופה 
 router.post('/addMedication', (req, res) => {
 
-    const { child_id, medication, dosage } = req.body;
+    const { child_id, medication, dosage, sendTime } = req.body;
 
     // קודם נכניס/נמצא תרופה
     const findOrInsert = `
@@ -177,7 +177,7 @@ router.post('/addMedication', (req, res) => {
         const insertLog = `
             INSERT INTO linkingtable
             (child_id, medication_id, given_by, mail_sent_at, dosage)
-            VALUES (${child_id}, ${medication_id}, 1, NOW(), '${dosage}')
+            VALUES (${child_id}, ${medication_id}, 1, '${dosage})
         `;
 
         db.query(insertLog, (err2) => {
@@ -185,5 +185,40 @@ router.post('/addMedication', (req, res) => {
 
             res.send("Medication added");
         });
+    });
+});
+
+//הצגת התרופות מהדי בי
+router.get('/getMedications', (req, res) => {
+
+    const sql = `SELECT id, name FROM medications`;
+
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).send("DB error");
+        res.json(results);
+    });
+});
+
+//הוספת תרופה 
+router.post('/addMedicationType', (req, res) => {
+
+    const { name, antibiotic } = req.body;
+
+    if (!name) {
+        return res.send("Medication name required");
+    }
+
+    const sql = `
+        INSERT INTO medications (name, antibiotics)
+        VALUES ('${name}', '${antibiotic}')
+    `;
+
+    db.query(sql, (err) => {
+        if (err) {
+            console.log(err);
+            return res.send("DB error");
+        }
+
+        res.send("Medication added successfully");
     });
 });
