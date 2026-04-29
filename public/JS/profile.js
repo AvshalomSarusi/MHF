@@ -161,14 +161,15 @@ fetch('/getMedications')
 
     });
 //--------------------------------------------------כפתורי סגירה-----------------------------------------------------------------
-    window.closeRelativeRow  = function (btn) {
-        const row = btn.parentNode.parentNode;
-        row.remove();
-        relativeTable.style.display = "none";
-    }
 
-    window.closeMedicationRow  = function (btn) {
-        const row = btn.parentNode.parentNode;
-        row.remove();
-        medicationTable.style.display = "none";
-    }
+window.closeRelativeRow = function (btn) {
+    const row = btn.parentNode.parentNode;
+    row.remove();
+    relativeTable.style.display = "none";
+}
+
+window.closeMedicationRow = function (btn) {
+    const row = btn.parentNode.parentNode;
+    row.remove();
+    medicationTable.style.display = "none";
+}

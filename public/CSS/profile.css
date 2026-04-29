@@ -17,11 +17,13 @@ table {
     width: 10%;
 }
 
-th, td {
+th,
+td {
     border: 1px solid black;
     padding: 8px;
     text-align: center;
 }
+
 .form-row {
     display: flex;
     gap: 10px;

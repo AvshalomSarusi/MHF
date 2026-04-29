@@ -8,7 +8,7 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 const LogDir = router.use(express.static(path.join(__dirname, '..', 'public')));
 const userController = require('../controller/userController');
-const sendMail = require('../public/JS/mailer');
+const sendMail = require('../utils/mailer');
 
 let currentUser = null;
 
