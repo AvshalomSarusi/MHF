@@ -160,7 +160,7 @@ router.get('/getChildren', (req, res) => {
 // הוספת תרופה 
 router.post('/addMedication', (req, res) => {
 
-    const { child_id, medication, dosage, sendTime } = req.body;
+    const { child_id, medication, dosage } = req.body;
 
     // קודם נכניס/נמצא תרופה
     const findOrInsert = `
@@ -208,17 +208,35 @@ router.post('/addMedicationType', (req, res) => {
         return res.send("Medication name required");
     }
 
-    const sql = `
-        INSERT INTO medications (name, antibiotics)
-        VALUES ('${name}', '${antibiotic}')
+    const checkSql = `
+        SELECT * FROM medications
+        WHERE name = '${name}'
     `;
 
-    db.query(sql, (err) => {
+    db.query(checkSql, (err, results) => {
+
         if (err) {
             console.log(err);
-            return res.send("DB error");
+            return res.send("DB check error");
         }
 
-        res.send("Medication added successfully");
+        if (results.length > 0) {
+            return res.send(`${name} already exists`);
+        }
+
+        const insertSql = `
+            INSERT INTO medications (name, antibiotics)
+            VALUES ('${name}', '${antibiotic}')
+        `;
+
+        db.query(insertSql, (err2) => {
+
+            if (err2) {
+                console.log(err2);
+                return res.send("DB insert error");
+            }
+
+            res.send("Medication added successfully");
+        });
     });
 });

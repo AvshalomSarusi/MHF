@@ -1,29 +1,34 @@
 const btn = document.getElementById("createRelative");
-const table = document.getElementById("relativeTable");
+const relativeTable = document.getElementById("relativeTable");
+const medicationTable = document.getElementById("medicationTable");
 const body = document.getElementById("relativeTableBody");
 
 //הבאת נתונים מהדאטה בייס עבר המשתמש
 fetch('/getUser')
-.then(res => res.json())
-.then(data => {
-    document.getElementById("hello").innerText = "Hello " + data.firstname+".";
-})
-.catch(err => {
-    console.log(err);
-});
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("hello").innerText = "Hello " + data.firstname + ".";
+    })
+    .catch(err => {
+        console.log(err);
+    });
+//--------------------------------------------------בן משפחה-----------------------------------------------------------------
 
 //כשלוחצים על הכפטור ליצירת ילד או בן משפחה אחר
-btn.addEventListener("click",()=>{
-    table.style.display = "table";
+btn.addEventListener("click", () => {
+    relativeTable.style.display = "table";
 
     const row = document.createElement("tr");
 
     row.innerHTML = `
     <td><input type ="text" placeholder = "Relative name"></td>
-    <td><button onclick="saveChild(this)">Save</button>
+    <td><button onclick="saveChild(this)">Save</button></td>
+    <td><button onclick="closeRelativeRow (this)">Close</button</td>
     `;
     body.appendChild(row);
 });
+
+
 
 function saveChild(btn) {//מכיל את האלמנט של הכפטור הספציפי (this).
     const row = btn.parentNode.parentNode;
@@ -34,11 +39,11 @@ function saveChild(btn) {//מכיל את האלמנט של הכפטור הספצ
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
     })
-    .then(res => res.text())
-    .then(data => {
-        console.log(data);
-    });
-    table.style.display="none";
+        .then(res => res.text())
+        .then(data => {
+            console.log(data);
+        });
+    relativeTable.style.display = "none";
 };
 
 //טבלת בן משפחה ותרופות 
@@ -84,19 +89,20 @@ fetch('/getChildren')
             select.appendChild(option);
         });
     });
+//--------------------------------------------------תרופות-----------------------------------------------------------------
 
-    //הוספת תרופה 
-    const medBtn = document.getElementById("createMedication");
-    const medTable = document.getElementById("medicationTable");
-    const medBody = document.getElementById("medicationTableBody");
-    
-    medBtn.addEventListener("click", () => {
-    
-        medTable.style.display = "table";
-    
-        const row = document.createElement("tr");
-    
-        row.innerHTML = `
+//הוספת תרופה 
+const medBtn = document.getElementById("createMedication");
+const medTable = document.getElementById("medicationTable");
+const medBody = document.getElementById("medicationTableBody");
+
+medBtn.addEventListener("click", () => {
+
+    medTable.style.display = "table";
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
             <td><input type="text" placeholder="Medication name"></td>
             <td>
                 <select>
@@ -105,28 +111,29 @@ fetch('/getChildren')
                 </select>
             </td>
             <td><button onclick="saveMedication(this)">Save</button></td>
+            <td><button onclick="closeMedicationRow(this)">Close</button</td>
         `;
-    
-        medBody.appendChild(row);
-    });
 
-    window.saveMedication = function(btn) {
+    medBody.appendChild(row);
+});
 
-        const row = btn.parentNode.parentNode;
-    
-        const name = row.children[0].children[0].value;
-        const antibiotic = row.children[1].children[0].value;
-    
-        if (!name) {
-            alert("Enter medication name");
-            return;
-        }
-    
-        fetch('/addMedicationType', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, antibiotic })
-        })
+window.saveMedication = function (btn) {
+
+    const row = btn.parentNode.parentNode;
+
+    const name = row.children[0].children[0].value;
+    const antibiotic = row.children[1].children[0].value;
+
+    if (!name) {
+        alert("Enter medication name");
+        return;
+    }
+
+    fetch('/addMedicationType', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, antibiotic })
+    })
         .then(res => res.text())
         .then(msg => {
             console.log("SERVER:", msg);
@@ -136,10 +143,10 @@ fetch('/getChildren')
         .catch(err => {
             console.log("ERROR:", err);
         });
-    };
+};
 
-    //הצגת התרופות בבחירה
-    fetch('/getMedications')
+//הצגת התרופות בבחירה
+fetch('/getMedications')
     .then(res => res.json())
     .then(data => {
 
@@ -153,3 +160,15 @@ fetch('/getChildren')
         });
 
     });
+//--------------------------------------------------כפתורי סגירה-----------------------------------------------------------------
+    window.closeRelativeRow  = function (btn) {
+        const row = btn.parentNode.parentNode;
+        row.remove();
+        relativeTable.style.display = "none";
+    }
+
+    window.closeMedicationRow  = function (btn) {
+        const row = btn.parentNode.parentNode;
+        row.remove();
+        medicationTable.style.display = "none";
+    }
