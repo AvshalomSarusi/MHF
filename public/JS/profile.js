@@ -23,7 +23,7 @@ btn.addEventListener("click", () => {
     row.innerHTML = `
     <td><input type ="text" placeholder = "Relative name"></td>
     <td><button onclick="saveChild(this)">Save</button></td>
-    <td><button onclick="closeRelativeRow (this)">Close</button</td>
+    <td><button onclick="closeRelativeRow(this)">Close</button</td>
     `;
     body.appendChild(row);
 });
@@ -93,6 +93,7 @@ fetch('/getChildren')
 const medBtn = document.getElementById("createMedication");
 const medTable = document.getElementById("medicationTable");
 const medBody = document.getElementById("medicationTableBody");
+
 //הצגת הטבלה של בחירת פרופה לילד בשעה מסויימת
 medBtn.addEventListener("click", () => {
 
@@ -109,7 +110,7 @@ medBtn.addEventListener("click", () => {
                 </select>
             </td>
             <td><button onclick="saveMedication(this)">Save</button></td>
-            <td><button onclick="closeMedicationRow(this)">Close</button</td>
+            <td><button onclick="closeMedicationRow(this)">Close</button></td>
         `;
 
     medBody.appendChild(row);
@@ -233,7 +234,7 @@ document.getElementById("addGuardian").addEventListener("click", () => {
         alert(msg);
 
         if (msg === "Guardian added successfully") {
-            
+
             document.getElementById("guardianName").value = "";
             document.getElementById("guardianRelationship").value = "";
             document.getElementById("guardianEmail").value = "";

@@ -28,16 +28,23 @@ router.get('/getLogs', (req, res) => {
 
     const sql = `
     SELECT 
-        c.name AS child_name,
-        m.name AS medication_name,
-        u.firstname AS given_by,
-        l.mail_sent_at,
-        l.given_at,
-        l.dosage
-    FROM linkingtable l
-    JOIN childe c ON l.child_id = c.id
-    JOIN medications m ON l.medication_id = m.id
-    JOIN users u ON l.given_by = u.id
+        childe.name AS child_name,
+        medications.name AS medication_name,
+        COALESCE(users.firstname, 'Pending') AS given_by,
+        linkingtable.mail_sent_at,
+        linkingtable.given_at,
+        linkingtable.dosage
+
+        FROM linkingtable
+
+        JOIN childe
+        ON linkingtable.child_id = childe.id
+
+        JOIN medications
+        ON linkingtable.medication_id = medications.id
+
+        LEFT JOIN users
+        ON linkingtable.given_by = users.id
 `;
 
     db.query(sql, (err, results) => {
