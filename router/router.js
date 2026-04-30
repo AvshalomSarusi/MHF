@@ -49,6 +49,10 @@ router.get('/getLogs', (req, res) => {
     console.log("GET LOGS RUNNING");
 });
 
+//דף החלפת סיסמא
+router.get('/changePass',(req,res)=>{
+    res.sendFile(path.join(__dirname,'..','public','Views','ChngePass.html'));
+});
 // דף ההרשמה
 router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'Register.html'));
@@ -240,3 +244,6 @@ router.post('/addMedicationType', (req, res) => {
         });
     });
 });
+
+//אחרי קבלת הודעת אבטחה שמישהו מנסה להיכנס עם המייל שלנו 
+router.post('/changePass',userController.ChangePass);

@@ -5,7 +5,7 @@ const sendMail = require('../utils/mailer');
 function createProfile(req, res) {
 
     let msg;
-    
+
     const { name, last, email, pass } = req.body;
 
     if (!name || !last || !email || !pass) {
@@ -23,7 +23,7 @@ function createProfile(req, res) {
 
         // אם נמצא משתמש עם אותו אימייל
         if (checkResult.length > 0) {
-            
+
             const existingName = checkResult[0].firstname;
 
             msg = messages.securityEmailAlreadyExists(existingName);
@@ -35,7 +35,7 @@ function createProfile(req, res) {
             );
 
             return res.status(400).send(messages.emailAlreadyExists);
-            
+
         }
 
         // אם האימייל פנוי - ממשיכים הרשמה
@@ -48,7 +48,7 @@ function createProfile(req, res) {
                 return res.status(500).send("DB error");
             }
 
-            msg=messages.welcome(name);
+            msg = messages.welcome(name);
 
             sendMail(
                 email,
@@ -61,6 +61,59 @@ function createProfile(req, res) {
     });
 }
 
+function ChangePass(req, res) {
+
+    let msg;
+
+    const { name, lname, email, pass1, pass2 } = req.body;
+
+    if (!name || !lname || !email || !pass1 || !pass2) {
+        return res.status(400).send("Missing required fields");
+    }
+
+    if (pass1 === pass2) {
+        return res.status(400).send("New password must be different from old password");
+    }
+
+    const checkDetails = `SELECT * FROM users WHERE email ='${email}'`;
+
+    db.query(checkDetails,(err,result)=>{
+        if(err){
+            console.log(err);
+            return res.status(500).send("DB Error");
+        }
+
+        if(result.length===0){
+            return res.status(400).send("User not found");
+        }
+
+        const user=result[0];
+
+        if( name!==user.firstname || lname!==user.lastname || pass1!==user.password){
+            return res.status(400).send("One or more of your details are incorrect");
+        }
+
+        const updateSql = `UPDATE users SET password='${pass2}' WHERE email='${email}'`;
+
+        db.query(updateSql,(err,result)=>{
+            if(err){
+                console.log(err);
+                return res.status(500).send("Password update filed");
+            }
+
+            msg = messages.passwordChanged(name);
+
+            sendMail(
+                email,
+                msg.subject,
+                msg.text
+            );
+
+            res.send(messages.passChange);
+        });
+    });
+}
 module.exports = {
-    createProfile
+    createProfile,
+    ChangePass
 };
