@@ -13,9 +13,9 @@ function createProfile(req, res) {
     }
 
     // בדיקה אם האימייל כבר קיים
-    const checkSql = `SELECT * FROM users WHERE email = '${email}'`;
+    const checkSql = `SELECT * FROM users WHERE email = ?`;
 
-    db.query(checkSql, (checkErr, checkResult) => {
+    db.query(checkSql, [email],(checkErr, checkResult) => {
         if (checkErr) {
             console.log(checkErr);
             return res.status(500).send("DB error");
@@ -61,7 +61,7 @@ function createProfile(req, res) {
     });
 }
 
-function ChangePass(req, res) {
+function changePass(req, res) {
 
     let msg;
 
@@ -75,9 +75,9 @@ function ChangePass(req, res) {
         return res.status(400).send("New password must be different from old password");
     }
 
-    const checkDetails = `SELECT * FROM users WHERE email ='${email}'`;
+    const checkDetails = `SELECT * FROM users WHERE email =?`;
 
-    db.query(checkDetails,(err,result)=>{
+    db.query(checkDetails,[email],(err,result)=>{
         if(err){
             console.log(err);
             return res.status(500).send("DB Error");
@@ -93,12 +93,12 @@ function ChangePass(req, res) {
             return res.status(400).send("One or more of your details are incorrect");
         }
 
-        const updateSql = `UPDATE users SET password='${pass2}' WHERE email='${email}'`;
+        const updateSql = `UPDATE users SET password='${pass2}' WHERE email=?`;
 
-        db.query(updateSql,(err,result)=>{
+        db.query(updateSql,[email],(err,result)=>{
             if(err){
                 console.log(err);
-                return res.status(500).send("Password update filed");
+                return res.status(500).send("Password update failed");
             }
 
             msg = messages.passwordChanged(name);
@@ -115,5 +115,5 @@ function ChangePass(req, res) {
 }
 module.exports = {
     createProfile,
-    ChangePass
+    changePass
 };

@@ -246,4 +246,4 @@ router.post('/addMedicationType', (req, res) => {
 });
 
 //אחרי קבלת הודעת אבטחה שמישהו מנסה להיכנס עם המייל שלנו 
-router.post('/changePass',userController.ChangePass);
+router.post('/changePass',userController.changePass);
