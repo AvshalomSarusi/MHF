@@ -17,23 +17,31 @@ cron.schedule('* * * * *', () => {
         +
         now.getMinutes().toString().padStart(2, '0');
 
-        console.log(`CRON CHECKING NOW: ${currentTime}`);
-        
+    console.log(`CRON CHECKING NOW: ${currentTime}`);
+
     const sql = `
         SELECT 
-            l.id,
-            l.dosage,
-            l.scheduled_time,
-            c.name AS child_name,
-            m.name AS medication_name,
-            u.email,
-            u.firstname
-        FROM linkingtable l
-        JOIN childe c ON l.child_id = c.id
-        JOIN medications m ON l.medication_id = m.id
-        JOIN users u ON l.given_by = u.id
-        WHERE TIME_FORMAT(l.scheduled_time, '%H:%i') = ?
-    `;
+        linkingtable.id,
+        linkingtable.dosage,
+        linkingtable.scheduled_time,
+        childe.name AS child_name,
+        medications.name AS medication_name,
+        users.email,
+        users.firstname
+
+        FROM linkingtable
+
+        JOIN childe 
+        ON linkingtable.child_id = childe.id
+
+        JOIN medications 
+        ON linkingtable.medication_id = medications.id
+
+        JOIN users 
+        ON linkingtable.given_by = users.id
+
+        WHERE TIME_FORMAT(linkingtable.scheduled_time, '%H:%i') = ?
+        `;
 
     db.query(sql, [currentTime], (err, results) => {
 
