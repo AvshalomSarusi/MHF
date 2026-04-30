@@ -3,6 +3,8 @@ const db = require('../dbConfig');
 const path = require('path');
 const port = 3002;
 
+require('../utils/cronJobs');
+
 const router = express();
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
