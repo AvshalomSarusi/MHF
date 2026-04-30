@@ -28,8 +28,6 @@ btn.addEventListener("click", () => {
     body.appendChild(row);
 });
 
-
-
 function saveChild(btn) {//מכיל את האלמנט של הכפטור הספציפי (this).
     const row = btn.parentNode.parentNode;
     const name = row.children[0].children[0].value;
@@ -95,7 +93,7 @@ fetch('/getChildren')
 const medBtn = document.getElementById("createMedication");
 const medTable = document.getElementById("medicationTable");
 const medBody = document.getElementById("medicationTableBody");
-
+//הצגת הטבלה של בחירת פרופה לילד בשעה מסויימת
 medBtn.addEventListener("click", () => {
 
     medTable.style.display = "table";
@@ -160,8 +158,51 @@ fetch('/getMedications')
         });
 
     });
-//--------------------------------------------------כפתורי סגירה-----------------------------------------------------------------
+   
+//כלוחצים על כפתור הAdd
+document.getElementById("addMedication").addEventListener("click", () => {
 
+    const child_id = document.getElementById("childSelect").value;
+    const medication = document.getElementById("medicationSelect").value;
+    const dosage = document.getElementById("dosage").value;
+    const timeToSend = document.getElementById("timeToSend").value;
+
+    if (!child_id || !medication || !dosage || !timeToSend) {
+        alert("All fields are required");
+        return;
+    }
+
+    fetch('/addMedication', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            child_id,
+            medication,
+            dosage,
+            timeToSend
+        })
+    })
+    .then(res => res.text())
+    .then(msg => {
+
+        console.log("SERVER:", msg);
+        alert(msg);
+
+        // איפוס שדות אחרי הצלחה
+        if (msg === "Medication added") {
+            
+            document.getElementById("childSelect").selectedIndex = 0;
+            document.getElementById("medicationSelect").selectedIndex = 0;
+            document.getElementById("dosage").value = "";
+            document.getElementById("timeToSend").value = "";
+        }
+    })
+    .catch(err => {
+        console.log("ERROR:", err);
+    });
+
+});
+//--------------------------------------------------כפתורי סגירה-----------------------------------------------------------------
 window.closeRelativeRow = function (btn) {
     const row = btn.parentNode.parentNode;
     row.remove();

@@ -161,34 +161,31 @@ router.get('/getChildren', (req, res) => {
     });
 });
 
-// הוספת תרופה 
+// הוספת תרופה ושעת נטילה לילד
 router.post('/addMedication', (req, res) => {
 
-    const { child_id, medication, dosage } = req.body;
+    const { child_id, medication, dosage, timeToSend } = req.body;
 
-    // קודם נכניס/נמצא תרופה
-    const findOrInsert = `
-        INSERT INTO medications (name)
-        VALUES ('${medication}')
-        ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)
+    if (!child_id || !medication || !dosage || !timeToSend) {
+        return res.send("All fields are required");
+    }
+
+    const medication_id = medication;
+
+    const insertLog = `
+        INSERT INTO linkingtable
+        (child_id, medication_id, given_by, dosage, scheduled_time)
+        VALUES (${child_id}, ${medication_id}, ${currentUser.id}, '${dosage}', '${timeToSend}')
     `;
 
-    db.query(findOrInsert, (err, result) => {
-        if (err) return res.send("DB error");
+    db.query(insertLog, (err) => {
 
-        const medication_id = result.insertId;
+        if (err) {
+            console.log("INSERT LOG ERROR:", err);
+            return res.send("Insert error");
+        }
 
-        const insertLog = `
-            INSERT INTO linkingtable
-            (child_id, medication_id, given_by, mail_sent_at, dosage)
-            VALUES (${child_id}, ${medication_id}, 1, '${dosage})
-        `;
-
-        db.query(insertLog, (err2) => {
-            if (err2) return res.send("Insert error");
-
-            res.send("Medication added");
-        });
+        res.send("Medication added");
     });
 });
 
