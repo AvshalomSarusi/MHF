@@ -159,7 +159,7 @@ fetch('/getMedications')
 
     });
    
-//כלוחצים על כפתור הAdd
+//כלוחצים על כפתור הAdd addMedication
 document.getElementById("addMedication").addEventListener("click", () => {
 
     const child_id = document.getElementById("childSelect").value;
@@ -202,6 +202,50 @@ document.getElementById("addMedication").addEventListener("click", () => {
     });
 
 });
+
+//כאשר לוחצים על Add Guardian
+document.getElementById("addGuardian").addEventListener("click", () => {
+
+    const name = document.getElementById("guardianName").value;
+    const relationship = document.getElementById("guardianRelationship").value;
+    const email = document.getElementById("guardianEmail").value;
+
+    if (!name || !relationship || !email) {
+        alert("All guardian fields are required");
+        return;
+    }
+
+    fetch('/addGuardian', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name,
+            relationship,
+            email
+        })
+    })
+    .then(res => res.text())
+    .then(msg => {
+
+        console.log("GUARDIAN SERVER:", msg);
+        alert(msg);
+
+        if (msg === "Guardian added successfully") {
+            
+            document.getElementById("guardianName").value = "";
+            document.getElementById("guardianRelationship").value = "";
+            document.getElementById("guardianEmail").value = "";
+        }
+
+    })
+    .catch(err => {
+        console.log("GUARDIAN ERROR:", err);
+    });
+
+});
+
 //--------------------------------------------------כפתורי סגירה-----------------------------------------------------------------
 window.closeRelativeRow = function (btn) {
     const row = btn.parentNode.parentNode;

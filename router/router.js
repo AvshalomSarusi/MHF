@@ -139,6 +139,52 @@ router.post('/addChild', (req, res) => {
     });
 });
 
+//הוספת שמרטף 
+router.post('/addGuardian', (req, res) => {
+
+    const { name, relationship, email } = req.body;
+
+    // בדיקה שכל השדות קיימים
+    if (!name || !relationship || !email) {
+        return res.send("All guardian fields are required");
+    }
+
+    // בדיקה אם כבר קיים Guardian עם אותו מייל
+    const checkSql = `
+        SELECT * FROM guardian
+        WHERE email = '${email}'
+    `;
+
+    db.query(checkSql, (err, results) => {
+
+        if (err) {
+            console.log(err);
+            return res.send("Guardian DB check error");
+        }
+
+        if (results.length > 0) {
+            return res.send("Guardian already exists");
+        }
+
+        const insertSql = `
+            INSERT INTO guardian (name, relationship, email)
+            VALUES ('${name}', '${relationship}', '${email}')
+        `;
+
+        db.query(insertSql, (err2) => {
+
+            if (err2) {
+                console.log(err2);
+                return res.send("Guardian insert error");
+            }
+
+            res.send("Guardian added successfully");
+        });
+
+    });
+
+});
+
 //בדיקה שהכול עובד נכון עם שליחת האימיילים
 router.get('/testMailer', (req, res) => {
 
@@ -162,6 +208,7 @@ router.get('/getChildren', (req, res) => {
         res.json(results);
     });
 });
+
 
 // הוספת תרופה ושעת נטילה לילד
 router.post('/addMedication', (req, res) => {
@@ -190,6 +237,7 @@ router.post('/addMedication', (req, res) => {
         res.send("Medication added");
     });
 });
+
 
 //הצגת התרופות מהדי בי
 router.get('/getMedications', (req, res) => {
