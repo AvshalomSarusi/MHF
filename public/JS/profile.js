@@ -16,16 +16,20 @@ fetch('/getUser')
 
 //כשלוחצים על הכפטור ליצירת ילד או בן משפחה אחר
 btn.addEventListener("click", () => {
-    relativeTable.style.display = "table";
+    if (relativeTable.style.display === "none") {
+        relativeTable.style.display = "table";
 
-    const row = document.createElement("tr");
+        const row = document.createElement("tr");
 
-    row.innerHTML = `
+        row.innerHTML = `
     <td><input type ="text" placeholder = "Relative name"></td>
     <td><button onclick="saveChild(this)">Save</button></td>
     <td><button onclick="closeRelativeRow(this)">Close</button</td>
     `;
-    body.appendChild(row);
+        body.appendChild(row);
+    } else {
+        return;
+    }
 });
 
 function saveChild(btn) {//מכיל את האלמנט של הכפטור הספציפי (this).
@@ -87,6 +91,7 @@ fetch('/getChildren')
             select.appendChild(option);
         });
     });
+
 //--------------------------------------------------תרופות-----------------------------------------------------------------
 
 //הוספת תרופה 
@@ -97,11 +102,12 @@ const medBody = document.getElementById("medicationTableBody");
 //הצגת הטבלה של בחירת פרופה לילד בשעה מסויימת
 medBtn.addEventListener("click", () => {
 
-    medTable.style.display = "table";
+    if (medTable.style.display === "none") {
+        medTable.style.display = "table";
 
-    const row = document.createElement("tr");
+        const row = document.createElement("tr");
 
-    row.innerHTML = `
+        row.innerHTML = `
             <td><input type="text" placeholder="Medication name"></td>
             <td>
                 <select>
@@ -113,7 +119,10 @@ medBtn.addEventListener("click", () => {
             <td><button onclick="closeMedicationRow(this)">Close</button></td>
         `;
 
-    medBody.appendChild(row);
+        medBody.appendChild(row);
+    } else {
+        return;
+    }
 });
 
 window.saveMedication = function (btn) {
@@ -159,7 +168,7 @@ fetch('/getMedications')
         });
 
     });
-   
+
 //כלוחצים על כפתור הAdd addMedication
 document.getElementById("addMedication").addEventListener("click", () => {
 
@@ -183,24 +192,24 @@ document.getElementById("addMedication").addEventListener("click", () => {
             timeToSend
         })
     })
-    .then(res => res.text())
-    .then(msg => {
+        .then(res => res.text())
+        .then(msg => {
 
-        console.log("SERVER:", msg);
-        alert(msg);
+            console.log("SERVER:", msg);
+            alert(msg);
 
-        // איפוס שדות אחרי הצלחה
-        if (msg === "Medication added") {
-            
-            document.getElementById("childSelect").selectedIndex = 0;
-            document.getElementById("medicationSelect").selectedIndex = 0;
-            document.getElementById("dosage").value = "";
-            document.getElementById("timeToSend").value = "";
-        }
-    })
-    .catch(err => {
-        console.log("ERROR:", err);
-    });
+            // איפוס שדות אחרי הצלחה
+            if (msg === "Medication added") {
+
+                document.getElementById("childSelect").selectedIndex = 0;
+                document.getElementById("medicationSelect").selectedIndex = 0;
+                document.getElementById("dosage").value = "";
+                document.getElementById("timeToSend").value = "";
+            }
+        })
+        .catch(err => {
+            console.log("ERROR:", err);
+        });
 
 });
 
@@ -227,23 +236,23 @@ document.getElementById("addGuardian").addEventListener("click", () => {
             email
         })
     })
-    .then(res => res.text())
-    .then(msg => {
+        .then(res => res.text())
+        .then(msg => {
 
-        console.log("GUARDIAN SERVER:", msg);
-        alert(msg);
+            console.log("GUARDIAN SERVER:", msg);
+            alert(msg);
 
-        if (msg === "Guardian added successfully") {
+            if (msg === "Guardian added successfully") {
 
-            document.getElementById("guardianName").value = "";
-            document.getElementById("guardianRelationship").value = "";
-            document.getElementById("guardianEmail").value = "";
-        }
+                document.getElementById("guardianName").value = "";
+                document.getElementById("guardianRelationship").value = "";
+                document.getElementById("guardianEmail").value = "";
+            }
 
-    })
-    .catch(err => {
-        console.log("GUARDIAN ERROR:", err);
-    });
+        })
+        .catch(err => {
+            console.log("GUARDIAN ERROR:", err);
+        });
 
 });
 
