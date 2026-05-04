@@ -82,13 +82,19 @@ window.onload = function () {
 fetch('/getChildren')
     .then(res => res.json())
     .then(data => {
-        const select = document.getElementById("childSelect");
+        const select1 = document.getElementById("childSelect1");
+        const select2 = document.getElementById("childSelect2");
 
         data.forEach(child => {
-            const option = document.createElement("option");
-            option.value = child.id;
-            option.textContent = child.name;
-            select.appendChild(option);
+            const option1 = document.createElement("option");
+            option1.value = child.id;
+            option1.textContent = child.name;
+            select1.appendChild(option1);
+
+            const option2 = document.createElement("option");
+            option2.value = child.id;
+            option2.textContent = child.name;
+            select2.appendChild(option2);
         });
     });
 
@@ -256,6 +262,45 @@ document.getElementById("addGuardian").addEventListener("click", () => {
 
 });
 
+fetch('/getGuardian')
+    .then(res => res.json())
+    .then(data => {
+        const guardianSelect = document.getElementById("guardianChildSelect");
+
+        data.forEach(guardian => {
+
+            const option = document.createElement("option");
+            option.value = guardian.id;
+            option.textContent = guardian.name;
+            guardianSelect.appendChild(option);
+        });
+    });
+
+document.getElementById("saveGurdianForRelative").addEventListener("click", () => {
+
+    const child_id = document.getElementById("childSelect2").value;
+    const guardian_id = document.getElementById("guardianChildSelect").value;
+
+    if (!child_id || !guardian_id) {
+        alert("Please select relative and guardian");
+        return;
+    }
+
+    fetch('/addChildGuardian', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ child_id, guardian_id })
+    })
+
+        .then(res => res.text())
+        .then(msg => {
+            alert(msg);
+        })
+
+        .catch(err => {
+            console.log(err);
+        });
+});
 //--------------------------------------------------כפתורי סגירה-----------------------------------------------------------------
 window.closeRelativeRow = function (btn) {
     const row = btn.parentNode.parentNode;

@@ -14,9 +14,10 @@
     <h2 id="hello"></h2><br>
 
     <!--כפטור להכנסת ילד או בן משפחה-->
-    <button id="createRelative">Add Relative</button>
-    <button id="createMedication">Add Medication</button>
-
+    <div id="addButton">
+        <button id="createRelative">Add Relative</button>
+        <button id="createMedication">Add Medication</button>
+    </div><br>
     <!--טבלה להכנסת ילד או בן משפחה חדש-->
     <table id="relativeTable" border="1" style="display:none;">
         <tr>
@@ -37,10 +38,9 @@
     </table>
 
     <p>Add new event</p>
-
     <!--בחירת בן משפחה -->
     <div class="form-row">
-        <select id="childSelect">
+        <select id="childSelect1">
             <option value="" disabled selected hidden>Select Relative</option>
         </select>
 
@@ -49,19 +49,29 @@
             <option value="" disabled selected hidden>Select Medication</option>
         </select>
         <input type="text" id="dosage" placeholder="Dosage (e.g. 8ml)">
-        <p>All day in time -</p><input type="time" id="timeToSend" placeholder="Time to send messege">
+        All day in time -<input type="time" id="timeToSend" placeholder="Time to send messege">
         <button id="addMedication">Add</button>
     </div><br>
 
-    <!--הוספת שמרטף בייביסיטר מטפל וכו-->
+    <!--הוספת שמרטף/בייביסיטר/מטפל וכו-->
     <p>Add a new guardian</p>
+    <div class="form-row">
+        <input type="text" id="guardianName" placeholder="Guardian name">
+        <input type="text" id="guardianRelationship" placeholder="Relationship (e.g. Babysitter)">
+        <input type="email" id="guardianEmail" placeholder="Guardian email">
+        <button id="addGuardian">Add Guardian</button>
+    </div><br>
 
-<div class="form-row">
-    <input type="text" id="guardianName" placeholder="Guardian name">
-    <input type="text" id="guardianRelationship" placeholder="Relationship (e.g. Babysitter)">
-    <input type="email" id="guardianEmail" placeholder="Guardian email">
-    <button id="addGuardian">Add Guardian</button>
-</div><br>
+    <p>Add guardian for children</p>
+    <div class="form-row">
+        <select id="childSelect2">
+            <option value="" disabled selected hidden>Select Relative</option>
+        </select>
+        <select id="guardianChildSelect">
+            <option value="" disabled selected hidden>Select Guardian</option>
+        </select>
+        <button id="saveGurdianForRelative">Save</button>
+    </div><br>
 
     <!--טבלת המציגה את הנתונים של בן המשפחה והתרופה-->
     <table border="1">

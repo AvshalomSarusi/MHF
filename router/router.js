@@ -216,7 +216,18 @@ router.get('/getChildren', (req, res) => {
     });
 });
 
+//בחירת שמרטף
+router.get('/getGuardian',(req,res)=>{
+    const sql =`SELECT id, name From guardian`;
 
+    db.query(sql, (err,result)=>{
+        if(err){
+            console.log(err);
+            return res.status(500).send("DB error");
+        }
+        res.json(result);
+    })
+})
 // הוספת תרופה ושעת נטילה לילד
 router.post('/addMedication', (req, res) => {
 
@@ -299,5 +310,46 @@ router.post('/addMedicationType', (req, res) => {
     });
 });
 
+router.post('/addChildGuardian',(req,res)=>{
+
+    const {child_id, guardian_id}=req.body;
+
+    if(!child_id || !guardian_id){
+        return res.send("Missing data");
+    }
+
+    const checkSql =`
+    SELECT *
+    FROM child_guardian
+    WHERE child_id = '${child_id}'
+    AND guardian_id = '${guardian_id}'
+    `;
+
+    db.query(checkSql,(err,result)=>{
+        if(err){
+            console.log(err);
+            return res.send("BD check error");
+        }
+
+        if(result.length>0){
+            return res.send("Guardian already linked to this relative");
+        }
+
+        const insertSql = `
+        INSERT INTO child_guardian (child_id, guardian_id)
+        VALUES ('${child_id}','${guardian_id}')
+        `;
+
+        db.query(insertSql,(err)=>{
+
+            if(err){
+                console.log("DB insert error");
+            }
+
+            res.send("Guardian linked successfuly");
+            
+        });
+    });
+});
 //אחרי קבלת הודעת אבטחה שמישהו מנסה להיכנס עם המייל שלנו 
 router.post('/changePass',userController.changePass);
