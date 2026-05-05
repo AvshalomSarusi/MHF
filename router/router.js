@@ -14,60 +14,13 @@ const sendMail = require('../utils/mailer');
 
 let currentUser = null;
 
+//Server
 router.listen(port, () => {
     console.log(`Server is lesten http://localhost:${port}`);
 
 });
 
-// דף הפרופיל
-router.get('/p', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'ProfilePage.html'));
-});
-
-router.get('/getLogs', (req, res) => {
-
-    const sql = `
-    SELECT 
-        childe.name AS child_name,
-        medications.name AS medication_name,
-        COALESCE(users.firstname, 'Pending') AS given_by,
-        linkingtable.mail_sent_at,
-        linkingtable.given_at,
-        linkingtable.dosage
-
-        FROM linkingtable
-
-        JOIN childe
-        ON linkingtable.child_id = childe.id
-
-        JOIN medications
-        ON linkingtable.medication_id = medications.id
-
-        LEFT JOIN users
-        ON linkingtable.given_by = users.id
-`;
-
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("DB error");
-        }
-
-        res.json(results);
-    });
-    console.log("GET LOGS RUNNING");
-});
-
-//דף החלפת סיסמא
-router.get('/changePass',(req,res)=>{
-    res.sendFile(path.join(__dirname,'..','public','Views','ChngePass.html'));
-});
-// דף ההרשמה
-router.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'Register.html'));
-});
-
-//חיבור הדאטה
+//DB Connected
 db.connect((err) => {
     if (err) {
         console.error("Database connection faild:", err.massage);
@@ -76,280 +29,52 @@ db.connect((err) => {
     }
 });
 
-//הצגת דף הכניסה שלי
+//----------------------------------------------------------PAGES----------------------------------------------------------
+
+//File - LoginPage.html
 router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'LoginPage.html'));
 });
 
-//בודק שם המשתמש והסיסמא מול הדאטה בייס
-router.post('/', (req, res) => {
-    const { nickname, pass } = req.body;
-
-    // שאלה לדאטאבייס כדי לבדוק אם יש את המשתמש עם הסיסמה הזו
-    console.log({ nickname });
-    const query = `SELECT * FROM users WHERE firstname = '${nickname}' AND password = '${pass}'`;
-
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error("Database query failed:", err.message);
-            return res.status(500).send("Database query failed");
-        }
-
-        if (results.length > 0) {
-            // אם יש תוצאה, המשתמש קיים והסיסמה 
-            currentUser = results[0];
-            res.redirect('/p');
-        } else {
-            // אם אין תוצאה, שם המשתמש או הסיסמה לא נכונים
-            res.send("Incorrect username or password.");
-        }
-    });
+//File - ProfilePage.html
+router.get('/p', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'ProfilePage.html'));
 });
 
-//הדאטה בייס מחזיר את פרטי המשתמש המחובר
-router.get('/getUser', (req, res) => {
-    if (!currentUser) {
-        return res.status(401).send("Not logged in");
-    }
-
-    const sql = `SELECT firstname FROM users WHERE id = ${currentUser.id}`;
-
-    db.query(sql, (err, results) => {
-        if (err) {
-            return res.status(500).send("DB error");
-        }
-
-        res.json(results[0]);
-    });
+//File - ChngePass.html
+router.get('/changePass',(req,res)=>{
+    res.sendFile(path.join(__dirname,'..','public','Views','ChngePass.html'));
 });
 
-// יצירת פרופיל חדש 
+//Register page
+router.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'Register.html'));
+});
+
+//----------------------------------------------------------PATHS----------------------------------------------------------
+
+//USER
+router.post('/',userController.login);
+router.get('/getUser',userController.getUser);
 router.post('/register', userController.createProfile);
-
-//הכנסת ילד או בן משפחה אחר לדאטה בייס
-router.post('/addChild', (req, res) => {
-    const { name } = req.body;
-
-    if (!name) {
-        return res.send("Name is required");
-    }
-
-    const sql = `INSERT INTO childe (name) VALUES ('${name}')`;
-
-    db.query(sql, (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.send("DB error");
-        }
-        console.log({ name })
-        res.send("Child added successfully");
-    });
-});
-
-//הוספת שמרטף 
-router.post('/addGuardian', (req, res) => {
-
-    const { name, relationship, email } = req.body;
-
-    // בדיקה שכל השדות קיימים
-    if (!name || !relationship || !email) {
-        return res.send("All guardian fields are required");
-    }
-
-    // בדיקה אם כבר קיים Guardian עם אותו מייל
-    const checkSql = `
-        SELECT * FROM guardian
-        WHERE email = '${email}'
-    `;
-
-    db.query(checkSql, (err, results) => {
-
-        if (err) {
-            console.log(err);
-            return res.send("Guardian DB check error");
-        }
-
-        if (results.length > 0) {
-            return res.send("Guardian already exists");
-        }
-
-        const insertSql = `
-            INSERT INTO guardian (name, relationship, email)
-            VALUES ('${name}', '${relationship}', '${email}')
-        `;
-
-        db.query(insertSql, (err2) => {
-
-            if (err2) {
-                console.log(err2);
-                return res.send("Guardian insert error");
-            }
-
-            res.send("Guardian added successfully");
-        });
-
-    });
-
-});
-
-//בדיקה שהכול עובד נכון עם שליחת האימיילים
-router.get('/testMailer', (req, res) => {
-
-    sendMail(
-        "myEmail@gmail.com",
-        "Test from MHF",
-        "It worked"
-    )
-    res.send("Mail sent");
-});
-
-// בחירת בן משפחה 
-router.get('/getChildren', (req, res) => {
-    const sql = `SELECT id, name FROM childe`;
-
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("DB error");
-        }
-        res.json(results);
-    });
-});
-
-//בחירת שמרטף
-router.get('/getGuardian',(req,res)=>{
-    const sql =`SELECT id, name From guardian`;
-
-    db.query(sql, (err,result)=>{
-        if(err){
-            console.log(err);
-            return res.status(500).send("DB error");
-        }
-        res.json(result);
-    })
-})
-// הוספת תרופה ושעת נטילה לילד
-router.post('/addMedication', (req, res) => {
-
-    const { child_id, medication, dosage, timeToSend } = req.body;
-
-    if (!child_id || !medication || !dosage || !timeToSend) {
-        return res.send("All fields are required");
-    }
-
-    const medication_id = medication;
-
-    const insertLog = `
-        INSERT INTO linkingtable
-        (child_id, medication_id, given_by, dosage, scheduled_time)
-        VALUES (${child_id}, ${medication_id}, ${currentUser.id}, '${dosage}', '${timeToSend}')
-    `;
-
-    db.query(insertLog, (err) => {
-
-        if (err) {
-            console.log("INSERT LOG ERROR:", err);
-            return res.send("Insert error");
-        }
-
-        res.send("Medication added");
-    });
-});
-
-
-//הצגת התרופות מהדי בי
-router.get('/getMedications', (req, res) => {
-
-    const sql = `SELECT id, name FROM medications`;
-
-    db.query(sql, (err, results) => {
-        if (err) return res.status(500).send("DB error");
-        res.json(results);
-    });
-});
-
-//הוספת תרופה 
-router.post('/addMedicationType', (req, res) => {
-
-    const { name, antibiotic } = req.body;
-
-    if (!name) {
-        return res.send("Medication name required");
-    }
-
-    const checkSql = `
-        SELECT * FROM medications
-        WHERE name = '${name}'
-    `;
-
-    db.query(checkSql, (err, results) => {
-
-        if (err) {
-            console.log(err);
-            return res.send("DB check error");
-        }
-
-        if (results.length > 0) {
-            return res.send(`${name} already exists`);
-        }
-
-        const insertSql = `
-            INSERT INTO medications (name, antibiotics)
-            VALUES ('${name}', '${antibiotic}')
-        `;
-
-        db.query(insertSql, (err2) => {
-
-            if (err2) {
-                console.log(err2);
-                return res.send("DB insert error");
-            }
-
-            res.send("Medication added successfully");
-        });
-    });
-});
-
-router.post('/addChildGuardian',(req,res)=>{
-
-    const {child_id, guardian_id}=req.body;
-
-    if(!child_id || !guardian_id){
-        return res.send("Missing data");
-    }
-
-    const checkSql =`
-    SELECT *
-    FROM child_guardian
-    WHERE child_id = '${child_id}'
-    AND guardian_id = '${guardian_id}'
-    `;
-
-    db.query(checkSql,(err,result)=>{
-        if(err){
-            console.log(err);
-            return res.send("BD check error");
-        }
-
-        if(result.length>0){
-            return res.send("Guardian already linked to this relative");
-        }
-
-        const insertSql = `
-        INSERT INTO child_guardian (child_id, guardian_id)
-        VALUES ('${child_id}','${guardian_id}')
-        `;
-
-        db.query(insertSql,(err)=>{
-
-            if(err){
-                console.log("DB insert error");
-            }
-
-            res.send("Guardian linked successfuly");
-            
-        });
-    });
-});
-//אחרי קבלת הודעת אבטחה שמישהו מנסה להיכנס עם המייל שלנו 
 router.post('/changePass',userController.changePass);
+
+//RELATIVE
+router.post('/addChild',userController.addChild);
+router.get('/getChildren',userController.getChildren);
+
+//GUARDIAN
+router.post('/addGuardian',userController.addGuardian);
+router.get('/getGuardian',userController.getGuardian);
+router.post('/addChildGuardian',userController.addChildGuardian);
+
+//MEDICATION
+router.post('/addMedication',userController.addMedication);
+router.post('/addMedicationType',userController.addMedicationType);
+router.get('/getMedications',userController.getMedications);
+
+//LOGS
+router.get('/getLogs',userController.getLogs);
+
+//TEST
+router.get('/testMailer',userController.testMailer);

@@ -46,6 +46,7 @@ function saveChild(btn) {//מכיל את האלמנט של הכפטור הספצ
             console.log(data);
         });
     relativeTable.style.display = "none";
+    row.remove();
 };
 
 //טבלת בן משפחה ותרופות 
@@ -178,7 +179,8 @@ fetch('/getMedications')
 //כלוחצים על כפתור הAdd addMedication
 document.getElementById("addMedication").addEventListener("click", () => {
 
-    const child_id = document.getElementById("childSelect").value;
+    console.log("cklicked");
+    const child_id = document.getElementById("childSelect1").value;
     const medication = document.getElementById("medicationSelect").value;
     const dosage = document.getElementById("dosage").value;
     const timeToSend = document.getElementById("timeToSend").value;
@@ -197,6 +199,7 @@ document.getElementById("addMedication").addEventListener("click", () => {
             dosage,
             timeToSend
         })
+    
     })
         .then(res => res.text())
         .then(msg => {
@@ -218,6 +221,7 @@ document.getElementById("addMedication").addEventListener("click", () => {
         });
 
 });
+
 
 //כאשר לוחצים על Add Guardian
 document.getElementById("addGuardian").addEventListener("click", () => {
