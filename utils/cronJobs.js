@@ -56,35 +56,23 @@ cron.schedule('* * * * *', () => {
             return;
         }
 
-        results.forEach(row => {
+            results.forEach(row => {
 
-            const msg = messages.medicationReminder(
-                row.firstname,
+            const msg = message.medicationReminder(
+                row.guardian_name,
                 row.child_name,
                 row.medication_name,
                 row.dosage,
                 currentTime
             );
-
+        
             sendMail(
-                row.email,
+                row.guardian_email,
                 msg.subject,
                 msg.text
             );
-
-            console.log("Reminder sent to:", row.email);
-
-            const updateSql = `
-                UPDATE linkingtable
-                SET mail_sent_at = NOW()
-                WHERE id = ?
-            `;
-
-            db.query(updateSql, [row.id], (updateErr) => {
-                if (updateErr) {
-                    console.log("MAIL UPDATE ERROR:", updateErr);
-                }
-            });
+        
+            console.log("Reminder sent to:", row.guardian_email);
 
         });
 

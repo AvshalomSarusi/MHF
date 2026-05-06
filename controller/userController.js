@@ -289,19 +289,19 @@ exports.getLogs = (req, res) => {
         linkingtable.scheduled_time,
         guardian.name AS guardian_name
     
-    FROM linkingtable
+        FROM linkingtable
     
-    JOIN childe
-    ON linkingtable.child_id = childe.id
+        JOIN childe
+        ON linkingtable.child_id = childe.id
     
-    JOIN medications
-    ON linkingtable.medication_id = medications.id
+        JOIN medications
+        ON linkingtable.medication_id = medications.id
     
-    LEFT JOIN child_guardian
-    ON linkingtable.child_id = child_guardian.child_id
+        LEFT JOIN child_guardian
+        ON linkingtable.child_id = child_guardian.child_id
     
-    LEFT JOIN guardian
-    ON child_guardian.guardian_id = guardian.id`;
+        LEFT JOIN guardian
+        ON child_guardian.guardian_id = guardian.id`;
 
     db.query(sql, (err, results) => {
         if (err) {

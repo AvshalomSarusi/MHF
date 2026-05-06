@@ -3,6 +3,7 @@ const relativeTable = document.getElementById("relativeTable");
 const medicationTable = document.getElementById("medicationTable");
 const body = document.getElementById("relativeTableBody");
 
+
 //הבאת נתונים מהדאטה בייס עבר המשתמש
 fetch('/getUser')
     .then(res => res.json())
@@ -129,33 +130,7 @@ medBtn.addEventListener("click", () => {
     }
 });
 
-window.saveMedication = function (btn) {
 
-    const row = btn.parentNode.parentNode;
-
-    const name = row.children[0].children[0].value;
-    const antibiotic = row.children[1].children[0].value;
-
-    if (!name) {
-        alert("Enter medication name");
-        return;
-    }
-
-    fetch('/addMedicationType', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, antibiotic })
-    })
-        .then(res => res.text())
-        .then(msg => {
-            console.log("SERVER:", msg);
-            alert(msg);
-            location.reload();
-        })
-        .catch(err => {
-            console.log("ERROR:", err);
-        });
-};
 
 //הצגת התרופות בבחירה
 fetch('/getMedications')
@@ -173,7 +148,7 @@ fetch('/getMedications')
 
     });
 
-//כלוחצים על כפתור הAdd addMedication
+//כלוחצים על כפתור הAdd id=addMedication
 document.getElementById("addMedication").addEventListener("click", () => {
 
     console.log("cklicked");
@@ -216,7 +191,6 @@ document.getElementById("addMedication").addEventListener("click", () => {
         .catch(err => {
             console.log("ERROR:", err);
         });
-
 });
 
 
@@ -307,10 +281,10 @@ window.closeRelativeRow = function (btn) {
     const row = btn.parentNode.parentNode;
     row.remove();
     relativeTable.style.display = "none";
-}
+};
 
 window.closeMedicationRow = function (btn) {
     const row = btn.parentNode.parentNode;
     row.remove();
     medicationTable.style.display = "none";
-}
+};
