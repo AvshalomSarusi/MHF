@@ -19,29 +19,31 @@ cron.schedule('* * * * *', () => {
 
     console.log(`CRON CHECKING NOW: ${currentTime}`);
 
-    const sql = `
-        SELECT 
-        linkingtable.id,
-        linkingtable.dosage,
-        linkingtable.scheduled_time,
-        childe.name AS child_name,
-        medications.name AS medication_name,
-        users.email,
-        users.firstname
+    const sql = 
+    `SELECT
+    linkingtable.id,
+    childe.name AS child_name,
+    medications.name AS medication_name,
+    linkingtable.dosage,
+    linkingtable.scheduled_time,
+    guardian.name AS guardian_name,
+    guardian.email AS guardian_email
 
-        FROM linkingtable
+    FROM linkingtable
 
-        JOIN childe 
-        ON linkingtable.child_id = childe.id
+    JOIN childe
+    ON linkingtable.child_id = childe.id
 
-        JOIN medications 
-        ON linkingtable.medication_id = medications.id
+    JOIN medications
+    ON linkingtable.medication_id = medications.id
 
-        JOIN users 
-        ON linkingtable.given_by = users.id
+    JOIN child_guardian
+    ON linkingtable.child_id = child_guardian.child_id
 
-        WHERE TIME_FORMAT(linkingtable.scheduled_time, '%H:%i') = ?
-        `;
+    JOIN guardian
+    ON child_guardian.guardian_id = guardian.id
+
+    WHERE TIME_FORMAT(linkingtable.scheduled_time, '%H:%i') = ? `;
 
     db.query(sql, [currentTime], (err, results) => {
 

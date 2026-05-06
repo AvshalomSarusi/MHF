@@ -4,7 +4,7 @@ const sendMail = require('../utils/mailer');
 
 let currentUser = null;
 
-exports.createProfile=(req, res)=> {
+exports.createProfile = (req, res) => {
 
     let msg;
 
@@ -63,7 +63,7 @@ exports.createProfile=(req, res)=> {
     });
 };
 
-exports.changePass=(req, res)=> {
+exports.changePass = (req, res) => {
 
     let msg;
 
@@ -116,7 +116,7 @@ exports.changePass=(req, res)=> {
     });
 };
 
-exports.login=(req, res)=> {
+exports.login = (req, res) => {
     const { nickname, pass } = req.body;
 
     const sql =
@@ -139,7 +139,7 @@ exports.login=(req, res)=> {
     });
 };
 
-exports.getUser=(req, res)=> {
+exports.getUser = (req, res) => {
 
     if (!currentUser) {
         return res.status(401).send("Not logged in.");
@@ -161,7 +161,7 @@ exports.getUser=(req, res)=> {
     });
 };
 
-exports.addChild=(req, res)=> {
+exports.addChild = (req, res) => {
 
     const { name } = req.body;
 
@@ -183,7 +183,7 @@ exports.addChild=(req, res)=> {
     });
 };
 
-exports.getChildren=(req, res)=> {
+exports.getChildren = (req, res) => {
 
     const sql =
         `SELECT id,name FROM childe`;
@@ -198,7 +198,7 @@ exports.getChildren=(req, res)=> {
     });
 };
 
-exports.addGuardian=(req, res)=> {
+exports.addGuardian = (req, res) => {
 
     const { name, relationship, email } = req.body;
 
@@ -236,7 +236,7 @@ exports.addGuardian=(req, res)=> {
     });
 };
 
-exports.getGuardian=(req, res)=> {
+exports.getGuardian = (req, res) => {
     const sql = `SELECT id, name From guardian`;
 
     db.query(sql, (err, result) => {
@@ -248,7 +248,7 @@ exports.getGuardian=(req, res)=> {
     });
 };
 
-exports.addChildGuardian=(req, res)=> {
+exports.addChildGuardian = (req, res) => {
     const { child_id, guardian_id } = req.body;
     if (!child_id || !guardian_id) {
         return res.send("Missing data");
@@ -280,26 +280,28 @@ exports.addChildGuardian=(req, res)=> {
     });
 };
 
-exports.getLogs=(req, res)=> {
+exports.getLogs = (req, res) => {
     const sql =
-        `SELECT 
+        `SELECT
         childe.name AS child_name,
         medications.name AS medication_name,
-        COALESCE(users.firstname, 'Pending') AS given_by,
-        linkingtable.mail_sent_at,
-        linkingtable.given_at,
-        linkingtable.dosage
-
-        FROM linkingtable
-
-        JOIN childe
-        ON linkingtable.child_id = childe.id
-
-        JOIN medications
-        ON linkingtable.medication_id = medications.id
-
-        LEFT JOIN users
-        ON linkingtable.given_by = users.id`;
+        linkingtable.dosage,
+        linkingtable.scheduled_time,
+        guardian.name AS guardian_name
+    
+    FROM linkingtable
+    
+    JOIN childe
+    ON linkingtable.child_id = childe.id
+    
+    JOIN medications
+    ON linkingtable.medication_id = medications.id
+    
+    LEFT JOIN child_guardian
+    ON linkingtable.child_id = child_guardian.child_id
+    
+    LEFT JOIN guardian
+    ON child_guardian.guardian_id = guardian.id`;
 
     db.query(sql, (err, results) => {
         if (err) {
@@ -312,7 +314,7 @@ exports.getLogs=(req, res)=> {
     console.log("GET LOGS RUNNING");
 };
 
-exports.testMailer=(req,res)=>{
+exports.testMailer = (req, res) => {
 
     sendMail(
         "myEmail@gmail.com",
@@ -322,7 +324,7 @@ exports.testMailer=(req,res)=>{
     res.send("Mail sent");
 };
 
-exports.addMedication=(req,res)=>{
+exports.addMedication = (req, res) => {
     const { child_id, medication, dosage, timeToSend } = req.body;
 
     if (!child_id || !medication || !dosage || !timeToSend) {
@@ -333,8 +335,8 @@ exports.addMedication=(req,res)=>{
 
     const insertLog = `
         INSERT INTO linkingtable
-        (child_id, medication_id, given_by, dosage, scheduled_time)
-        VALUES (${child_id}, ${medication_id}, ${currentUser.id}, '${dosage}', '${timeToSend}')
+        (child_id, medication_id, dosage, scheduled_time)
+        VALUES (${child_id}, ${medication_id},'${dosage}', '${timeToSend}')
     `;
 
     db.query(insertLog, (err) => {
@@ -348,7 +350,7 @@ exports.addMedication=(req,res)=>{
     });
 };
 
-exports.getMedications=(req,res)=>{
+exports.getMedications = (req, res) => {
     const sql = `SELECT id, name FROM medications`;
 
     db.query(sql, (err, results) => {
@@ -357,7 +359,7 @@ exports.getMedications=(req,res)=>{
     });
 };
 
-exports.addMedicationType=(req,res)=>{
+exports.addMedicationType = (req, res) => {
     const { name, antibiotic } = req.body;
 
     if (!name) {
@@ -396,20 +398,3 @@ exports.addMedicationType=(req,res)=>{
         });
     });
 };
-
-// module.exports = {
-//     createProfile,
-//     changePass,
-//     login,
-//     getUser,
-//     addChild,
-//     getChildren,
-//     addGuardian,
-//     getGuardian,
-//     addChildGuardian,
-//     getLogs,
-//     testMailer,
-//     addMedication,
-//     addMedicationType,
-//     getMedications,
-// };

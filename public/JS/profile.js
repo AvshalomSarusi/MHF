@@ -64,15 +64,12 @@ window.onload = function () {
 
                 const tr = document.createElement("tr");
 
-                tr.innerHTML = `
-                    <td>${row.child_name}</td>
+                tr.innerHTML =
+                 ` <td>${row.child_name}</td>
                     <td>${row.medication_name}</td>
                     <td>${row.dosage || ''}</td>
-                    <td>${row.given_by}</td>
-                    <td>${row.mail_sent_at || ''}</td>
-                    <td>${row.given_at || 'Pending'}</td>
-                `;
-
+                    <td>${row.scheduled_time}</td>
+                    <td>${row.guardian_name || ''}</td>`;
                 table.appendChild(tr);
             });
         })
