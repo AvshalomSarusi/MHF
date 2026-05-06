@@ -4,7 +4,7 @@ const sendMail = require('../utils/mailer');
 
 let currentUser = null;
 
-function createProfile(req, res) {
+exports.createProfile=(req, res)=> {
 
     let msg;
 
@@ -63,7 +63,7 @@ function createProfile(req, res) {
     });
 };
 
-function changePass(req, res) {
+exports.changePass=(req, res)=> {
 
     let msg;
 
@@ -116,7 +116,7 @@ function changePass(req, res) {
     });
 };
 
-function login(req, res) {
+exports.login=(req, res)=> {
     const { nickname, pass } = req.body;
 
     const sql =
@@ -139,7 +139,7 @@ function login(req, res) {
     });
 };
 
-function getUser(req, res) {
+exports.getUser=(req, res)=> {
 
     if (!currentUser) {
         return res.status(401).send("Not logged in.");
@@ -161,7 +161,7 @@ function getUser(req, res) {
     });
 };
 
-function addChild(req, res) {
+exports.addChild=(req, res)=> {
 
     const { name } = req.body;
 
@@ -183,7 +183,7 @@ function addChild(req, res) {
     });
 };
 
-function getChildren(req, res) {
+exports.getChildren=(req, res)=> {
 
     const sql =
         `SELECT id,name FROM childe`;
@@ -198,7 +198,7 @@ function getChildren(req, res) {
     });
 };
 
-function addGuardian(req, res) {
+exports.addGuardian=(req, res)=> {
 
     const { name, relationship, email } = req.body;
 
@@ -236,7 +236,7 @@ function addGuardian(req, res) {
     });
 };
 
-function getGuardian(req, res) {
+exports.getGuardian=(req, res)=> {
     const sql = `SELECT id, name From guardian`;
 
     db.query(sql, (err, result) => {
@@ -248,7 +248,7 @@ function getGuardian(req, res) {
     });
 };
 
-function addChildGuardian(req, res) {
+exports.addChildGuardian=(req, res)=> {
     const { child_id, guardian_id } = req.body;
     if (!child_id || !guardian_id) {
         return res.send("Missing data");
@@ -280,7 +280,7 @@ function addChildGuardian(req, res) {
     });
 };
 
-function getLogs(req, res) {
+exports.getLogs=(req, res)=> {
     const sql =
         `SELECT 
         childe.name AS child_name,
@@ -312,7 +312,7 @@ function getLogs(req, res) {
     console.log("GET LOGS RUNNING");
 };
 
-function testMailer(req,res){
+exports.testMailer=(req,res)=>{
 
     sendMail(
         "myEmail@gmail.com",
@@ -322,7 +322,7 @@ function testMailer(req,res){
     res.send("Mail sent");
 };
 
-function addMedication(req,res){
+exports.addMedication=(req,res)=>{
     const { child_id, medication, dosage, timeToSend } = req.body;
 
     if (!child_id || !medication || !dosage || !timeToSend) {
@@ -348,7 +348,7 @@ function addMedication(req,res){
     });
 };
 
-function getMedications(req,res){
+exports.getMedications=(req,res)=>{
     const sql = `SELECT id, name FROM medications`;
 
     db.query(sql, (err, results) => {
@@ -357,7 +357,7 @@ function getMedications(req,res){
     });
 };
 
-function addMedicationType(req,res){
+exports.addMedicationType=(req,res)=>{
     const { name, antibiotic } = req.body;
 
     if (!name) {
@@ -397,19 +397,19 @@ function addMedicationType(req,res){
     });
 };
 
-module.exports = {
-    createProfile,
-    changePass,
-    login,
-    getUser,
-    addChild,
-    getChildren,
-    addGuardian,
-    getGuardian,
-    addChildGuardian,
-    getLogs,
-    testMailer,
-    addMedication,
-    addMedicationType,
-    getMedications,
-};
+// module.exports = {
+//     createProfile,
+//     changePass,
+//     login,
+//     getUser,
+//     addChild,
+//     getChildren,
+//     addGuardian,
+//     getGuardian,
+//     addChildGuardian,
+//     getLogs,
+//     testMailer,
+//     addMedication,
+//     addMedicationType,
+//     getMedications,
+// };
