@@ -2,6 +2,7 @@ const db = require('../dbConfig');
 const messages = require('../utils/message');
 const sendMail = require('../utils/mailer');
 
+//USER
 exports.createProfile = (req, res) => {
 
     let msg;
@@ -167,6 +168,7 @@ exports.getUser = (req, res) => {
     });
 };
 
+//CHILD
 exports.addChild = (req, res) => {
 
     const userId = req.cookies.mhf_user;
@@ -217,6 +219,7 @@ exports.getChildren = (req, res) => {
     });
 };
 
+//GUARDIAN
 exports.addGuardian = (req, res) => {
 
     const userId = req.cookies.mhf_user;
@@ -324,6 +327,7 @@ exports.addChildGuardian = (req, res) => {
     });
 };
 
+//LOGS
 exports.getLogs = (req, res) => {
 
     const userId = req.cookies.mhf_user;
@@ -367,16 +371,7 @@ exports.getLogs = (req, res) => {
     console.log("GET LOGS RUNNING");
 };
 
-exports.testMailer = (req, res) => {
-
-    sendMail(
-        "myEmail@gmail.com",
-        "Test from MHF",
-        "It worked"
-    )
-    res.send("Mail sent");
-};
-
+//MEDICATION
 exports.addMedication = (req, res) => {
 
     const userId = req.cookies.mhf_user;
@@ -471,4 +466,15 @@ exports.addMedicationType = (req, res) => {
             res.send("Medication added successfully");
         });
     });
+};
+
+//TEST
+exports.testMailer = (req, res) => {
+
+    sendMail(
+        "myEmail@gmail.com",
+        "Test from MHF",
+        "It worked"
+    )
+    res.send("Mail sent");
 };
