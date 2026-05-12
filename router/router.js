@@ -1,6 +1,8 @@
 const express = require('express');
 const db = require('../dbConfig');
 const path = require('path');
+const coockieParser = require('cookie-parser');
+
 const port = 3002;
 
 require('../utils/cronJobs');
@@ -8,11 +10,10 @@ require('../utils/cronJobs');
 const router = express();
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
-const LogDir = router.use(express.static(path.join(__dirname, '..', 'public')));
+router.use(coockieParser());
+router.use(express.static(path.join(__dirname, '..', 'public')));
 const userController = require('../controller/userController');
-const sendMail = require('../utils/mailer');
 
-let currentUser = null;
 
 //Server
 router.listen(port, () => {

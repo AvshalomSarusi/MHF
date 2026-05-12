@@ -2,8 +2,6 @@ const db = require('../dbConfig');
 const messages = require('../utils/message');
 const sendMail = require('../utils/mailer');
 
-let currentUser = null;
-
 exports.createProfile = (req, res) => {
 
     let msg;
@@ -15,9 +13,9 @@ exports.createProfile = (req, res) => {
     }
 
     // בדיקה אם האימייל כבר קיים
-    const checkSql = `SELECT * FROM users WHERE email = ?`;
+    const checkSql = `SELECT * FROM users WHERE email = '${email}'`;
 
-    db.query(checkSql, [email], (checkErr, checkResult) => {
+    db.query(checkSql, (checkErr, checkResult) => {
         if (checkErr) {
             console.log(checkErr);
             return res.status(500).send("DB error");
@@ -77,9 +75,9 @@ exports.changePass = (req, res) => {
         return res.status(400).send("New password must be different from old password");
     }
 
-    const checkDetails = `SELECT * FROM users WHERE email =?`;
+    const checkDetails = `SELECT * FROM users WHERE email ='${email}'`;
 
-    db.query(checkDetails, [email], (err, result) => {
+    db.query(checkDetails, (err, result) => {
         if (err) {
             console.log(err);
             return res.status(500).send("DB Error");
@@ -95,7 +93,7 @@ exports.changePass = (req, res) => {
             return res.status(400).send("One or more of your details are incorrect");
         }
 
-        const updateSql = `UPDATE users SET password='${pass2}' WHERE email=?`;
+        const updateSql = `UPDATE users SET password='${pass2}' WHERE email='${email}`;
 
         db.query(updateSql, [email], (err, result) => {
             if (err) {
@@ -117,10 +115,11 @@ exports.changePass = (req, res) => {
 };
 
 exports.login = (req, res) => {
+
     const { nickname, pass } = req.body;
 
     const sql =
-        `SELECT * FROM users
+    `SELECT * FROM users
     WHERE firstname = '${nickname}'
     AND password = '${pass}'`;
 
@@ -131,7 +130,12 @@ exports.login = (req, res) => {
         }
 
         if (result.length > 0) {
-            currentUser = result[0];
+
+            res.cookie('mhf_user',result[0].id, {
+                maxAge: 1000 * 60 *60 * 24 * 7,
+                httpOnly: true
+            });
+
             res.redirect('/p');
         } else {
             res.send("Incorrect username or password.");
@@ -141,14 +145,16 @@ exports.login = (req, res) => {
 
 exports.getUser = (req, res) => {
 
-    if (!currentUser) {
+    const userId = req.cookies.mhf_user;
+
+    if (!userId) {
         return res.status(401).send("Not logged in.");
     }
 
     const sql =
         `SELECT firstname
     FROM users
-    WHERE id = '${currentUser.id}'`;
+    WHERE id = '${userId}'`;
 
     db.query(sql, (err, result) => {
 
@@ -163,15 +169,21 @@ exports.getUser = (req, res) => {
 
 exports.addChild = (req, res) => {
 
+    const userId = req.cookies.mhf_user;
     const { name } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
+
 
     if (!name) {
         return res.send("Name is required.");
     }
 
     const sql =
-        `INSERT INTO childe (name)
-    VALUES ('${name}')`;
+        `INSERT INTO childe (user_id, name)
+        VALUES ('${userId}','${name}')`;
 
     db.query(sql, (err) => {
         if (err) {
@@ -185,8 +197,15 @@ exports.addChild = (req, res) => {
 
 exports.getChildren = (req, res) => {
 
+    const userId = req.cookies.mhf_user;
+
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
+
     const sql =
-        `SELECT id,name FROM childe`;
+        `SELECT id,name FROM childe WHERE user_id = '${userId}'`;
 
     db.query(sql, (err, result) => {
         if (err) {
@@ -200,7 +219,12 @@ exports.getChildren = (req, res) => {
 
 exports.addGuardian = (req, res) => {
 
-    const { name, relationship, email } = req.body;
+    const userId = req.cookies.mhf_user;
+    const { name, relationship, email} = req.body;
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
 
     if (!name || !relationship || !email) {
         return res.status(400).send("Missing required fields");
@@ -208,7 +232,8 @@ exports.addGuardian = (req, res) => {
 
     const checkSql =
         `SELECT * FROM guardian
-    WHERE email = '${email}'`;
+        WHERE email = '${email}'
+        AND user_id = '${userId}'`;
 
     db.query(checkSql, (err, result) => {
 
@@ -222,8 +247,8 @@ exports.addGuardian = (req, res) => {
         }
 
         const insertSql =
-            `INSERT INTO guardian (name,relationship,email)
-        VALUES ('${name}','${relationship}','${email}')`;
+            `INSERT INTO guardian (user_id, name, relationship, email)
+            VALUES ('${userId}','${name}','${relationship}','${email}')`;
 
         db.query(insertSql, (err2) => {
             if (err2) {
@@ -231,13 +256,20 @@ exports.addGuardian = (req, res) => {
                 return res.status(500).send("DB error.");
             }
 
-            res.send("Guardian added successfully.");
+            res.send("Guardian added successfully");
         });
     });
 };
 
 exports.getGuardian = (req, res) => {
-    const sql = `SELECT id, name From guardian`;
+
+    const userId = req.cookies.mhf_user;
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
+
+    const sql = `SELECT id, name From guardian WHERE user_id = '${userId}'`;
 
     db.query(sql, (err, result) => {
         if (err) {
@@ -249,15 +281,27 @@ exports.getGuardian = (req, res) => {
 };
 
 exports.addChildGuardian = (req, res) => {
+
+    const userId = req.cookies.mhf_user;
     const { child_id, guardian_id } = req.body;
+
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
+
     if (!child_id || !guardian_id) {
+
         return res.send("Missing data");
     }
+
     const checkSql =
         `SELECT *
-    FROM child_guardian
-    WHERE child_id = '${child_id}'
-    AND guardian_id = '${guardian_id}'`;
+        FROM child_guardian
+        WHERE child_id = '${child_id}'
+        AND guardian_id = '${guardian_id}'
+        AND user_id = '${userId}'`;
+
     db.query(checkSql, (err, result) => {
         if (err) {
             console.log(err);
@@ -267,8 +311,8 @@ exports.addChildGuardian = (req, res) => {
             return res.send("Guardian already linked to this relative");
         }
         const insertSql =
-            `INSERT INTO child_guardian (child_id, guardian_id)
-        VALUES ('${child_id}','${guardian_id}')`;
+        `INSERT INTO child_guardian (user_id, child_id, guardian_id)
+        VALUES ('${userId}','${child_id}','${guardian_id}')`;
 
         db.query(insertSql, (err) => {
             if (err) {
@@ -281,6 +325,13 @@ exports.addChildGuardian = (req, res) => {
 };
 
 exports.getLogs = (req, res) => {
+
+    const userId = req.cookies.mhf_user;
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
+
     const sql =
         `SELECT
         childe.name AS child_name,
@@ -301,7 +352,9 @@ exports.getLogs = (req, res) => {
         ON linkingtable.child_id = child_guardian.child_id
     
         LEFT JOIN guardian
-        ON child_guardian.guardian_id = guardian.id`;
+        ON child_guardian.guardian_id = guardian.id
+        
+        WHERE linkingtable.user_id = '${userId}'`;
 
     db.query(sql, (err, results) => {
         if (err) {
@@ -325,7 +378,14 @@ exports.testMailer = (req, res) => {
 };
 
 exports.addMedication = (req, res) => {
+
+    const userId = req.cookies.mhf_user;
     const { child_id, medication, dosage, timeToSend } = req.body;
+
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
 
     if (!child_id || !medication || !dosage || !timeToSend) {
         return res.send("All fields are required");
@@ -335,8 +395,8 @@ exports.addMedication = (req, res) => {
 
     const insertLog = `
         INSERT INTO linkingtable
-        (child_id, medication_id, dosage, scheduled_time)
-        VALUES (${child_id}, ${medication_id},'${dosage}', '${timeToSend}')
+        (user_id, child_id, medication_id, dosage, scheduled_time)
+        VALUES (${userId}, ${child_id}, ${medication_id},'${dosage}', '${timeToSend}')
     `;
 
     db.query(insertLog, (err) => {
@@ -351,7 +411,15 @@ exports.addMedication = (req, res) => {
 };
 
 exports.getMedications = (req, res) => {
-    const sql = `SELECT id, name FROM medications`;
+    
+    const userId = req.cookies.mhf_user;
+
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
+
+    const sql = `SELECT id, name FROM medications WHERE user_id = '${userId}'`;
 
     db.query(sql, (err, results) => {
         if (err) return res.status(500).send("DB error");
@@ -360,7 +428,14 @@ exports.getMedications = (req, res) => {
 };
 
 exports.addMedicationType = (req, res) => {
+
+    const userId = req.cookies.mhf_user;
     const { name, antibiotic } = req.body;
+
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
 
     if (!name) {
         return res.send("Medication name required");
@@ -369,7 +444,7 @@ exports.addMedicationType = (req, res) => {
     const checkSql = `
         SELECT * FROM medications
         WHERE name = '${name}'
-    `;
+        AND user_id = '${userId}'`;
 
     db.query(checkSql, (err, results) => {
 
@@ -383,9 +458,8 @@ exports.addMedicationType = (req, res) => {
         }
 
         const insertSql = `
-            INSERT INTO medications (name, antibiotics)
-            VALUES ('${name}', '${antibiotic}')
-        `;
+            INSERT INTO medications (user_id, name, antibiotics)
+            VALUES ('${userId}','${name}', '${antibiotic}')`;
 
         db.query(insertSql, (err2) => {
 
