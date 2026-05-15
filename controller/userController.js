@@ -66,6 +66,8 @@ exports.changePass = (req, res) => {
 
     let msg;
 
+    const userId = req.userId;
+
     const { name, lname, email, pass1, pass2 } = req.body;
 
     if (!name || !lname || !email || !pass1 || !pass2) {
@@ -76,7 +78,7 @@ exports.changePass = (req, res) => {
         return res.status(400).send("New password must be different from old password");
     }
 
-    const checkDetails = `SELECT * FROM users WHERE email ='${email}'`;
+    const checkDetails = `SELECT * FROM users WHERE id ='${userId}'`;
 
     db.query(checkDetails, (err, result) => {
         if (err) {
@@ -94,7 +96,7 @@ exports.changePass = (req, res) => {
             return res.status(400).send("One or more of your details are incorrect");
         }
 
-        const updateSql = `UPDATE users SET password='${pass2}' WHERE email='${email}`;
+        const updateSql = `UPDATE users SET password='${pass2}' WHERE email='${email}'`;
 
         db.query(updateSql, [email], (err, result) => {
             if (err) {
@@ -134,7 +136,8 @@ exports.login = (req, res) => {
 
             res.cookie('mhf_user',result[0].id, {
                 maxAge: 1000 * 60 *60 * 24 * 7,
-                httpOnly: true
+                httpOnly: true,
+                sameSite: 'strict'
             });
 
             res.redirect('/p');
@@ -146,11 +149,7 @@ exports.login = (req, res) => {
 
 exports.getUser = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
+    const userId = req.userId;
 
     const sql =
         `SELECT firstname
@@ -171,13 +170,8 @@ exports.getUser = (req, res) => {
 //CHILD
 exports.addChild = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
+    const userId = req.userId;
     const { name } = req.body;
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
-
 
     if (!name) {
         return res.send("Name is required.");
@@ -199,12 +193,7 @@ exports.addChild = (req, res) => {
 
 exports.getChildren = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
-
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
+    const userId = req.userId;
 
     const sql =
         `SELECT id,name FROM childe WHERE user_id = '${userId}'`;
@@ -222,12 +211,8 @@ exports.getChildren = (req, res) => {
 //GUARDIAN
 exports.addGuardian = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
+    const userId = req.userId;
     const { name, relationship, email} = req.body;
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
 
     if (!name || !relationship || !email) {
         return res.status(400).send("Missing required fields");
@@ -266,11 +251,7 @@ exports.addGuardian = (req, res) => {
 
 exports.getGuardian = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
+    const userId = req.userId;
 
     const sql = `SELECT id, name From guardian WHERE user_id = '${userId}'`;
 
@@ -285,13 +266,8 @@ exports.getGuardian = (req, res) => {
 
 exports.addChildGuardian = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
+    const userId = req.userId;
     const { child_id, guardian_id } = req.body;
-
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
 
     if (!child_id || !guardian_id) {
 
@@ -330,11 +306,7 @@ exports.addChildGuardian = (req, res) => {
 //LOGS
 exports.getLogs = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
+    const userId = req.userId;
 
     const sql =
         `SELECT
@@ -374,13 +346,8 @@ exports.getLogs = (req, res) => {
 //MEDICATION
 exports.addMedication = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
+    const userId = req.userId;
     const { child_id, medication, dosage, timeToSend } = req.body;
-
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
 
     if (!child_id || !medication || !dosage || !timeToSend) {
         return res.send("All fields are required");
@@ -407,12 +374,7 @@ exports.addMedication = (req, res) => {
 
 exports.getMedications = (req, res) => {
     
-    const userId = req.cookies.mhf_user;
-
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
+    const userId = req.userId;
 
     const sql = `SELECT id, name FROM medications WHERE user_id = '${userId}'`;
 
@@ -424,13 +386,8 @@ exports.getMedications = (req, res) => {
 
 exports.addMedicationType = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
+    const userId = req.userId;
     const { name, antibiotic } = req.body;
-
-
-    if (!userId) {
-        return res.status(401).send("Not logged in.");
-    }
 
     if (!name) {
         return res.send("Medication name required");

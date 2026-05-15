@@ -13,6 +13,7 @@ router.use(express.urlencoded({ extended: true }));
 router.use(coockieParser());
 router.use(express.static(path.join(__dirname, '..', 'public')));
 const userController = require('../controller/userController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 
 //Server
@@ -38,12 +39,12 @@ router.get('/', (req, res) => {
 });
 
 //File - ProfilePage.html
-router.get('/p', (req, res) => {
+router.get('/p', authMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'ProfilePage.html'));
 });
 
 //File - ChngePass.html
-router.get('/changePass',(req,res)=>{
+router.get('/changePass', authMiddleware,(req,res)=>{
     res.sendFile(path.join(__dirname,'..','public','Views','ChngePass.html'));
 });
 
@@ -56,26 +57,26 @@ router.get('/register', (req, res) => {
 
 //USER
 router.post('/',userController.login);
-router.get('/getUser',userController.getUser);
+router.get('/getUser', authMiddleware, userController.getUser);
 router.post('/register', userController.createProfile);
-router.post('/changePass',userController.changePass);
+router.post('/changePass', authMiddleware, userController.changePass);
 
 //RELATIVE
-router.post('/addChild',userController.addChild);
-router.get('/getChildren',userController.getChildren);
+router.post('/addChild', authMiddleware, userController.addChild);
+router.get('/getChildren', authMiddleware, userController.getChildren);
 
 //GUARDIAN
-router.post('/addGuardian',userController.addGuardian);
-router.get('/getGuardian',userController.getGuardian);
-router.post('/addChildGuardian',userController.addChildGuardian);
+router.post('/addGuardian',authMiddleware, userController.addGuardian);
+router.get('/getGuardian',authMiddleware, userController.getGuardian);
+router.post('/addChildGuardian',authMiddleware, userController.addChildGuardian);
 
 //MEDICATION
-router.post('/addMedication',userController.addMedication);
-router.post('/addMedicationType',userController.addMedicationType);
-router.get('/getMedications',userController.getMedications);
+router.post('/addMedication',authMiddleware, userController.addMedication);
+router.post('/addMedicationType',authMiddleware, userController.addMedicationType);
+router.get('/getMedications',authMiddleware, userController.getMedications);
 
 //LOGS
-router.get('/getLogs',userController.getLogs);
+router.get('/getLogs',authMiddleware, userController.getLogs);
 
 //TEST
-router.get('/testMailer',userController.testMailer);
+router.get('/testMailer', userController.testMailer);
