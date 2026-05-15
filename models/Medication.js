@@ -6,8 +6,7 @@ class Medication {
     #name;
     #antibiotic;
 
-    constructor(id, userId, name, antibiotic) {
-        this.#id = id;
+    constructor(userId, name, antibiotic) {
         this.#userId = userId;
         this.#name = formatName(name);
         this.#antibiotic = antibiotic;

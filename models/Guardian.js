@@ -8,8 +8,7 @@ class Guardian {
     #relationship;
     #email;
 
-    constructor(id, userId, name, relationship, email) {
-        this.#id = id;
+    constructor(userId, name, relationship, email) {
         this.#userId = userId;
         this.#name = formatName(name);
         this.relationship = formatName(relationship);

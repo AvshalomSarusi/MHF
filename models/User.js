@@ -8,8 +8,7 @@ class User {
     #password;
     #email;
 
-    constructor(id, firstname, lastname, password, email) {
-        this.#id = id;
+    constructor(firstname, lastname, password, email) {
         this.#firstname = formatName(firstname);
         this.#lastname = formatName(lastname);
         this.#password = validatePassword(password);

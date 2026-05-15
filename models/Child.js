@@ -4,8 +4,7 @@ class Child {
     #userId;
     #name;
 
-    constructor(id, userId, name) {
-        this.#id = id;
+    constructor(userId, name) {
         this.#userId = userId;
         this.#name = formatName(name);
     }
