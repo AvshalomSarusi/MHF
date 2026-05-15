@@ -1,5 +1,5 @@
 const formatName = require('../utils/formatName');
-const validateEmail = require('../utils/patterns');
+const {validateEmail} = require('../utils/patterns');
 
 class Guardian {
     #id;
@@ -12,7 +12,8 @@ class Guardian {
         this.#userId = userId;
         this.#name = formatName(name);
         this.relationship = formatName(relationship);
-        this.#email = validateEmail(email);
+        if (!validateEmail(email)) { throw new Error("Invalid email format"); }
+        this.#email = email;
     }
     //GET
     getId() { return this.#id; }
@@ -41,4 +42,4 @@ class Guardian {
     }
 }
 
-module.exports.Guardian;
+module.exports = Guardian;

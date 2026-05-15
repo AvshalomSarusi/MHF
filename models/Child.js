@@ -23,4 +23,4 @@ class Child {
     }
 }
 
-module.exports.Child;
+module.exports = Child;

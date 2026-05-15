@@ -35,4 +35,4 @@ class Medication {
         this.#antibiotic = isAntibiotic === true || isAntibiotic === 1 ? 1 : 0;
     }
 }
-module.exports.Medication;
+module.exports = Medication;

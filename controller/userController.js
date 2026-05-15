@@ -1,11 +1,18 @@
 const db = require('../dbConfig');
 const messages = require('../utils/message');
 const sendMail = require('../utils/mailer');
+const { validateEmail, validatePassword } = require('../utils/patterns');
+const formatName = require('../utils/formatName');
+const User = require('../models/User');
+const Guardian = require('../models/Guardian');
+// const Relative = require('../models/Child');
+// const Medication = require('../models/Medication');
 
 //USER
 exports.createProfile = (req, res) => {
 
     let msg;
+    let user;
 
     const { name, last, email, pass } = req.body;
 
@@ -13,8 +20,14 @@ exports.createProfile = (req, res) => {
         return res.status(400).send("Missing required fields");
     }
 
+    try {
+        user = new User(name, last, pass, email)
+    } catch (error) {
+        return res.status(400).send(error.message);
+    }
+
     // בדיקה אם האימייל כבר קיים
-    const checkSql = `SELECT * FROM users WHERE email = '${email}'`;
+    const checkSql = `SELECT * FROM users WHERE email = '${user.getEmail()}'`;
 
     db.query(checkSql, (checkErr, checkResult) => {
         if (checkErr) {
@@ -41,7 +54,7 @@ exports.createProfile = (req, res) => {
 
         // אם האימייל פנוי - ממשיכים הרשמה
         const sql = `INSERT INTO users (firstname, lastname, password, email)
-        VALUES ('${name}', '${last}', '${pass}', '${email}')`;
+        VALUES ('${user.getFirstName()}', '${user.getLastName()}', '${pass}', '${user.getEmail()}')`;
 
         db.query(sql, (err, result) => {
             if (err) {
@@ -76,6 +89,14 @@ exports.changePass = (req, res) => {
 
     if (pass1 === pass2) {
         return res.status(400).send("New password must be different from old password");
+    }
+
+    if (!validateEmail(email)) {
+        return res.status(400).send("Invalid email format");
+    }
+
+    if (!validatePassword(pass2)) {
+        return res.ststus(400).send("Invalid new password format");
     }
 
     const checkDetails = `SELECT * FROM users WHERE id ='${userId}'`;
@@ -121,8 +142,15 @@ exports.login = (req, res) => {
 
     const { nickname, pass } = req.body;
 
+    if (!formatName(nickname)) {
+        throw new Error("Invalid nickname format");
+    }
+    if (!validatePassword(pass)) {
+        throw new Error("Invalid password format");
+    }
+
     const sql =
-    `SELECT * FROM users
+        `SELECT * FROM users
     WHERE firstname = '${nickname}'
     AND password = '${pass}'`;
 
@@ -134,8 +162,8 @@ exports.login = (req, res) => {
 
         if (result.length > 0) {
 
-            res.cookie('mhf_user',result[0].id, {
-                maxAge: 1000 * 60 *60 * 24 * 7,
+            res.cookie('mhf_user', result[0].id, {
+                maxAge: 1000 * 60 * 60 * 24 * 7,
                 httpOnly: true,
                 sameSite: 'strict'
             });
@@ -163,6 +191,10 @@ exports.getUser = (req, res) => {
             return res.status(500).send("DB error.");
         }
 
+        if (result.length === 0) {
+            return res.status(404).send("User not found");
+        }
+
         res.json(result[0]);
     });
 };
@@ -171,11 +203,13 @@ exports.getUser = (req, res) => {
 exports.addChild = (req, res) => {
 
     const userId = req.userId;
-    const { name } = req.body;
+    let { name } = req.body;
 
     if (!name) {
         return res.send("Name is required.");
     }
+
+    name = formatName(name);
 
     const sql =
         `INSERT INTO childe (user_id, name)
@@ -212,15 +246,23 @@ exports.getChildren = (req, res) => {
 exports.addGuardian = (req, res) => {
 
     const userId = req.userId;
-    const { name, relationship, email} = req.body;
+    const { name, relationship, email } = req.body;
 
     if (!name || !relationship || !email) {
         return res.status(400).send("Missing required fields");
     }
 
+    let guardian;
+
+    try {
+        guardian = new Guardian(userId, name, relationship, email);
+    }catch(error){
+        return res.status(400).send(error.message);
+    }
+    
     const checkSql =
         `SELECT * FROM guardian
-        WHERE email = '${email}'
+        WHERE email = '${guardian.getEmail()}'
         AND user_id = '${userId}'`;
 
     db.query(checkSql, (err, result) => {
@@ -236,7 +278,7 @@ exports.addGuardian = (req, res) => {
 
         const insertSql =
             `INSERT INTO guardian (user_id, name, relationship, email)
-            VALUES ('${userId}','${name}','${relationship}','${email}')`;
+            VALUES ('${userId}','${guardian.getName()}','${guardian.getRelationship()}','${guardian.getEmail()}')`;
 
         db.query(insertSql, (err2) => {
             if (err2) {
@@ -290,7 +332,7 @@ exports.addChildGuardian = (req, res) => {
             return res.send("Guardian already linked to this relative");
         }
         const insertSql =
-        `INSERT INTO child_guardian (user_id, child_id, guardian_id)
+            `INSERT INTO child_guardian (user_id, child_id, guardian_id)
         VALUES ('${userId}','${child_id}','${guardian_id}')`;
 
         db.query(insertSql, (err) => {
@@ -373,7 +415,7 @@ exports.addMedication = (req, res) => {
 };
 
 exports.getMedications = (req, res) => {
-    
+
     const userId = req.userId;
 
     const sql = `SELECT id, name FROM medications WHERE user_id = '${userId}'`;
@@ -393,9 +435,10 @@ exports.addMedicationType = (req, res) => {
         return res.send("Medication name required");
     }
 
+    let fixedName=formatName(name);
     const checkSql = `
         SELECT * FROM medications
-        WHERE name = '${name}'
+        WHERE name = '${fixedName}'
         AND user_id = '${userId}'`;
 
     db.query(checkSql, (err, results) => {
@@ -411,7 +454,7 @@ exports.addMedicationType = (req, res) => {
 
         const insertSql = `
             INSERT INTO medications (user_id, name, antibiotics)
-            VALUES ('${userId}','${name}', '${antibiotic}')`;
+            VALUES ('${userId}','${fixedName}', '${antibiotic}')`;
 
         db.query(insertSql, (err2) => {
 

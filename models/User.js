@@ -11,8 +11,10 @@ class User {
     constructor(firstname, lastname, password, email) {
         this.#firstname = formatName(firstname);
         this.#lastname = formatName(lastname);
-        this.#password = validatePassword(password);
-        this.#email = validateEmail(email);
+        if (!validatePassword(password)) { throw new Error("Invalid password format"); }
+        this.#password = password;
+        if (!validateEmail(email)) { throw new Error("Invalid email format"); }
+        this.#email = email;
     }
 
     //GET
@@ -20,6 +22,7 @@ class User {
     getFirstName() { return this.#firstname; }
     getLastName() { return this.#lastname; }
     getEmail() { return this.#email; }
+
     //SET
     setFirstName(newFirstName) {
         this.#firstname = formatName(newFirstName);
@@ -45,4 +48,4 @@ class User {
     }
 }
 
-module.exports.User;
+module.exports = User;

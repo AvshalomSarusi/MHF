@@ -23,3 +23,8 @@ function validatePassword(password) {
 
     return pattern.test(password);
 }
+
+module.exports={
+    validateEmail,
+    validatePassword
+};
