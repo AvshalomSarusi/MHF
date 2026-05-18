@@ -29,3 +29,26 @@ td {
     gap: 10px;
     align-items: center;
 }
+.menu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: inline-block;
+}
+
+.menu-items {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: -15%;
+    margin-top: 5px;
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px;
+}
+
+.menu-items button {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+
+    <title>MHL Edit</title>
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+
+<body>
+    <!--טבלת עריכה ומחיקת מסימות-->
+    <div id="tableBox">
+        <p>
+            You can change the dosage and medication time here by clicking the Edit button.<br>
+            You can also delete the task by clicking the Delete button.
+        </p>
+        <table border="1">
+            <tr>
+                <th>Relative</th>
+                <th>Medication</th>
+                <th>Dosage</th>
+                <th>Time to get</th>
+                <th>Guardian</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            <tbody id="logsTableBody"></tbody>
+        </table>
+    </div>
+    <hr>
+    <script src="/JS/edit.js"></script>
+</body>
+
+</html>

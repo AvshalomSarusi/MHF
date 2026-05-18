@@ -41,7 +41,7 @@ function postData(url, data) {
 function loadUser() {
     getData("/getUser")
         .then(data => {
-            document.getElementById("hello").innerText = `Hello ${data.firstname}.`;
+            document.getElementById("hello").innerText = `Hello ${data.firstname} and Welcome to yor profile.`;
         })
         .catch(err => console.log("USER ERROR:", err));
 }

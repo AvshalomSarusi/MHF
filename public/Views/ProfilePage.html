@@ -6,11 +6,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
 
-    <title>MHLProfile</title>
+    <title>MHL Profile</title>
     <link rel="stylesheet" href="css/profile.css">
 </head>
 
 <body>
+    <!--כפתור לפתיכת התפריט-->
+    <div class = "menu">
+        <button id="menueBtn">Menu</button>
+
+        <div id="menuItem" class="menu-items">
+            <button id="btnP" onclick="location.href='/p'">Profile</button>
+            <button id="btnE"onclick="location.href='/e'">Edit</button>
+        </div>
+    </div>
+
     <h2 id="hello"></h2><br>
 
     <!--כפטור להכנסת ילד או בן משפחה-->
@@ -88,6 +98,7 @@
     </table>
     </div>
     <script src="JS/profile.js"></script>
+    <script src="/JS/menu.js"></script>
 </body>
 
 </html>

@@ -175,6 +175,41 @@ exports.login = (req, res) => {
     });
 };
 
+exports.updateLog = (req, res) => {
+
+    const userId = req.userId;
+    const logId = req.params.id;
+
+    const { dosage, scheduled_time } = req.body;
+
+    if (!dosage || !scheduled_time) {
+        return res.status(400).send("Missing required fields");
+    }
+
+    const sql = `
+        UPDATE linkingtable
+        SET dosage = '${dosage}',
+            scheduled_time = '${scheduled_time}'
+        WHERE id = '${logId}'
+        AND user_id = '${userId}'
+    `;
+
+    db.query(sql, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Update failed");
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send("Record not found");
+        }
+
+        res.send("Updated successfully");
+
+    });
+};
+
 exports.getUser = (req, res) => {
 
     const userId = req.userId;
@@ -196,6 +231,33 @@ exports.getUser = (req, res) => {
         }
 
         res.json(result[0]);
+    });
+};
+
+exports.deleteLog = (req, res) => {
+
+    const userId = req.userId;
+    const logId = req.params.id;
+
+    const sql = `
+        DELETE FROM linkingtable
+        WHERE id = '${logId}'
+        AND user_id = '${userId}'
+    `;
+
+    db.query(sql, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Delete failed");
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send("Record not found");
+        }
+
+        res.send("Deleted successfully");
+
     });
 };
 
@@ -256,10 +318,10 @@ exports.addGuardian = (req, res) => {
 
     try {
         guardian = new Guardian(userId, name, relationship, email);
-    }catch(error){
+    } catch (error) {
         return res.status(400).send(error.message);
     }
-    
+
     const checkSql =
         `SELECT * FROM guardian
         WHERE email = '${guardian.getEmail()}'
@@ -352,6 +414,7 @@ exports.getLogs = (req, res) => {
 
     const sql =
         `SELECT
+        linkingtable.id,
         childe.name AS child_name,
         medications.name AS medication_name,
         linkingtable.dosage,
@@ -435,7 +498,7 @@ exports.addMedicationType = (req, res) => {
         return res.send("Medication name required");
     }
 
-    let fixedName=formatName(name);
+    let fixedName = formatName(name);
     const checkSql = `
         SELECT * FROM medications
         WHERE name = '${fixedName}'
