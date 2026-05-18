@@ -19,7 +19,7 @@ function validatePassword(password) {
 
     password = password.trim();
 
-    const pattern = /^[!@#$%^&*.?][A-Z]\d{6,8}$/;
+    const pattern = /^[!@#$%^&*.?][A-Z][a-z]*\d{6,8}$/;
 
     return pattern.test(password);
 }
