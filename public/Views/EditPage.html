@@ -7,11 +7,19 @@
     <meta charset="UTF-8">
 
     <title>MHL Edit</title>
-    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/edit.css">
 </head>
 
 <body>
     <!--טבלת עריכה ומחיקת מסימות-->
+    <div class = "menu">
+        <button id="menueBtn">Menu</button>
+
+        <div id="menuItem" class="menu-items">
+            <button id="btnP" onclick="location.href='/p'">Profile</button>
+            <button id="btnE"onclick="location.href='/e'">Edit</button>
+        </div>
+    </div>
     <div id="tableBox">
         <p>
             You can change the dosage and medication time here by clicking the Edit button.<br>
@@ -32,6 +40,7 @@
     </div>
     <hr>
     <script src="/JS/edit.js"></script>
+    <script src="/JS/menu.js"></script>
 </body>
 
 </html>

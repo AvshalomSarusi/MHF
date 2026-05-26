@@ -40,7 +40,7 @@ class User {
     }
     setEmail(newEmail) {
 
-        if (!validateEmail(email)) {
+        if (!validateEmail(newEmail)) {
             throw new Error("invalid email format");
         }
 
