@@ -81,6 +81,7 @@ router.post('/addChildGuardian',authMiddleware, userController.addChildGuardian)
 router.post('/addMedication',authMiddleware, userController.addMedication);
 router.post('/addMedicationType',authMiddleware, userController.addMedicationType);
 router.get('/getMedications',authMiddleware, userController.getMedications);
+router.delete('/deleteMedication/:id',authMiddleware,userController.deleteMedication);
 
 //LOGS
 router.get('/getLogs',authMiddleware, userController.getLogs);

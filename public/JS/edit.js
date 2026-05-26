@@ -1,7 +1,8 @@
 
-window.onload = function(){
+window.onload = function () {
     getLogs();
-}
+    loadMedicationsForDelete();
+};
 
 function getLogs() {
 
@@ -94,8 +95,57 @@ function editLog(id, currentDosage, currentTime) {
             alert(err.message);
             console.log("Update error:", err);
         });
-}
+};
 
-window.closeMenu = function(btn){
+window.closeMenu = function (btn) {
     logsTableBody.style.display = "none";
+};
+
+function loadMedicationsForDelete() {
+
+    fetch('/getMedications')
+        .then(res => res.json())
+        .then(data => {
+
+            const select = document.getElementById("medicationToDelete");
+
+            select.innerHTML = `<option value = "" disabled selected hidden>Select Madication</option>`;
+
+            data.forEach(med => {
+                const option = document.createElement("option");
+
+                option.value = med.id;
+                option.textContent = med.name;
+
+                select.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.log("Error loading medications:", err);
+        });
+};
+
+function deleteMedication() {
+
+    const medicationId = document.getElementById("medicationToDelete").value;
+
+    if (!medicationId) {
+        alert("Please select medication");
+        return;
+    }
+
+    fetch(`/deleteMedication/${medicationId}`, {
+        method: "DELETE"
+    })
+
+        .then(res => res.text())
+        .then(msg =>{
+
+            alert(msg);
+            loadMedicationsForDelete();
+            getLogs();
+        })
+        .catch(err =>{
+            console.log("Delete medication error:", err);
+        });
 }

@@ -12,12 +12,12 @@
 
 <body>
     <!--טבלת עריכה ומחיקת מסימות-->
-    <div class = "menu">
+    <div class="menu">
         <button id="menueBtn">Menu</button>
 
         <div id="menuItem" class="menu-items">
             <button id="btnP" onclick="location.href='/p'">Profile</button>
-            <button id="btnE"onclick="location.href='/e'">Edit</button>
+            <button id="btnE" onclick="location.href='/e'">Edit</button>
         </div>
     </div>
     <div id="tableBox">
@@ -37,6 +37,15 @@
             </tr>
             <tbody id="logsTableBody"></tbody>
         </table>
+    </div>
+    <hr>
+    <!--בחירת תרופה ומחיקתה-->
+    <div id="deleteMedicationBox">
+        <p>Delete medication</p>
+        <select id="medicationToDelete">
+            <option value="" disabled selected hidden>Select Medication</option>
+        </select>
+        <button onclick="deleteMedication()">Delete Medication</button>
     </div>
     <hr>
     <script src="/JS/edit.js"></script>

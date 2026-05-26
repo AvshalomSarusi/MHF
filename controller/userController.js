@@ -531,6 +531,48 @@ exports.addMedicationType = (req, res) => {
     });
 };
 
+exports.deleteMedication = (req,res)=>{
+
+    const userId = req.userId;
+    const medicationId = req.params.id;
+
+    if(!medicationId){
+        return res.status(400).send("Missing medication");
+    }
+
+    const deleteLogsSql = `
+    DELETE FROM linkingtable
+    WHERE medication_id = '${medicationId}'
+    AND user_Id = '${userId}'`;
+
+    db.query(deleteLogsSql, (err)=>{
+
+        if(err){
+            console.log(err);
+            return res.status(500).send("Delete medication logs failed");
+        }
+
+        const deleteMedicationSql = `
+        DELETE FROM medications
+        WHERE id ='${medicationId}'
+        AND user_id = '${userId}'`;
+
+        db.query(deleteMedicationSql,(err,result)=>{
+
+            if(err){
+                console.log(err);
+                return res.status(500).send("Delete medication medication failed");
+            }
+
+            if(result.affectedRows === 0){
+                return res.status(404).send("Medication not found");
+            }
+
+            res.send("Medication deleted successfully");
+        });
+    });
+}
+
 //TEST
 exports.testMailer = (req, res) => {
 
