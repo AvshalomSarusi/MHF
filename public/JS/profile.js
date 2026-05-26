@@ -50,6 +50,13 @@ function loadUser() {
 createRelativeBtn.addEventListener("click", openRelativeRow);
 
 function openRelativeRow() {
+    
+    if (medicationTable.style.display === "table"){
+
+        medicationTable.style.display = "none";
+        medicationTableBody.innerHTML="";
+    }
+        
     if (relativeTable.style.display !== "none") return;
 
     relativeTable.style.display = "table";
@@ -141,6 +148,13 @@ function loadLogs() {
 createMedicationBtn.addEventListener("click", openMedicationRow);
 
 function openMedicationRow() {
+
+    if (relativeTable.style.display === "table"){
+
+        relativeTable.style.display = "none";
+        relativeTableBody.innerHTML="";
+    }
+
     if (medicationTable.style.display !== "none") return;
 
     medicationTable.style.display = "table";
@@ -162,32 +176,32 @@ function openMedicationRow() {
     medicationTableBody.appendChild(row);
 }
 
-window.saveMedication = function(btn){
+window.saveMedication = function (btn) {
 
     const row = btn.parentNode.parentNode;
 
     const name = row.children[0].children[0].value;
     const antibiotic = row.children[0].children[0].value;
 
-    if(!name){
+    if (!name) {
         alert("Medication name is required");
         return;
     }
 
-    postData("/addMedicationType",{
+    postData("/addMedicationType", {
         name,
         antibiotic
     })
-    .then(msg => {
-        console.log("MEDICATION TYPE SERVER:", msg);
-        alert(msg);
+        .then(msg => {
+            console.log("MEDICATION TYPE SERVER:", msg);
+            alert(msg);
 
-        closeMedicationRow(btn);
-        loadMedications();
-    })
-    .catch(err => {
-        console.log("SAVE MEDICATION ERROR:", err);
-    });
+            closeMedicationRow(btn);
+            loadMedications();
+        })
+        .catch(err => {
+            console.log("SAVE MEDICATION ERROR:", err);
+        });
 };
 
 function loadMedications() {
@@ -270,8 +284,8 @@ addGuardianBtn.addEventListener("click", () => {
                 loadGuardians();
             }
         })
-        .catch(err =>
-            {console.log("GUARDIAN ERROR:", err)
+        .catch(err => {
+            console.log("GUARDIAN ERROR:", err)
         });
 });
 
