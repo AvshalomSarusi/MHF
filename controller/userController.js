@@ -236,28 +236,62 @@ exports.getUser = (req, res) => {
 
 exports.deleteLog = (req, res) => {
 
-    const userId = req.userId;
+    const userId = req.cookies.mhf_user;
     const logId = req.params.id;
 
-    const sql = `
-        DELETE FROM linkingtable
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
+
+    const getChildSql = `
+        SELECT child_id
+        FROM linkingtable
         WHERE id = '${logId}'
         AND user_id = '${userId}'
     `;
 
-    db.query(sql, (err, result) => {
+    db.query(getChildSql, (err, result) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("Delete failed");
+            return res.status(500).send("DB error");
         }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).send("Record not found");
+        if (result.length === 0) {
+            return res.status(404).send("Task not found");
         }
 
-        res.send("Deleted successfully");
+        const childId = result[0].child_id;
 
+        const deleteLogSql = `
+            DELETE FROM linkingtable
+            WHERE id = '${logId}'
+            AND user_id = '${userId}'
+        `;
+
+        db.query(deleteLogSql, (err2) => {
+
+            if (err2) {
+                console.log(err2);
+                return res.status(500).send("Delete task failed");
+            }
+
+            const deleteGuardianLinkSql = `
+                DELETE FROM child_guardian
+                WHERE child_id = '${childId}'
+                AND user_id = '${userId}'
+            `;
+
+            db.query(deleteGuardianLinkSql, (err3) => {
+
+                if (err3) {
+                    console.log(err3);
+                    return res.status(500).send("Delete guardian link failed");
+                }
+
+                res.send("Task deleted successfully");
+            });
+        });
     });
 };
 
@@ -438,7 +472,11 @@ exports.deleteGuardian=(req,res)=>{
 //LOGS
 exports.getLogs = (req, res) => {
 
-    const userId = req.userId;
+    const userId = req.cookies.mhf_user;
+
+    if (!userId) {
+        return res.status(401).send("Not logged in.");
+    }
 
     const sql =
         `SELECT
@@ -448,21 +486,15 @@ exports.getLogs = (req, res) => {
         linkingtable.dosage,
         linkingtable.scheduled_time,
         guardian.name AS guardian_name
-    
         FROM linkingtable
-    
         JOIN childe
         ON linkingtable.child_id = childe.id
-    
-        JOIN medications
-        ON linkingtable.medication_id = medications.id
-    
         LEFT JOIN child_guardian
         ON linkingtable.child_id = child_guardian.child_id
-    
+        JOIN medications
+        ON linkingtable.medication_id = medications.id
         LEFT JOIN guardian
         ON child_guardian.guardian_id = guardian.id
-        
         WHERE linkingtable.user_id = '${userId}'`;
 
     db.query(sql, (err, results) => {
