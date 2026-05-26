@@ -407,6 +407,34 @@ exports.addChildGuardian = (req, res) => {
     });
 };
 
+exports.deleteGuardian=(req,res)=>{
+
+    const userId = req.userId;
+    const guardianId = req.params.id;
+
+    if(!guardianId){
+        return res.status(400).send("Missing guardian");
+    }
+        const deleteGuardianSql = `
+        DELETE FROM guardian
+        WHERE id ='${guardianId}'
+        AND user_id='${userId}'`;
+
+        db.query(deleteGuardianSql,(err,result)=>{
+
+            if(err){
+                console.log(err);
+                return res.status(500).send("Delete guardian failed");
+            }
+
+            if(result.affectedRows===0){
+                return res.status(404).send("Guardian not found");
+            }
+
+            res.send("Guardian deleted successfully");
+        });
+};
+
 //LOGS
 exports.getLogs = (req, res) => {
 
@@ -540,18 +568,6 @@ exports.deleteMedication = (req,res)=>{
         return res.status(400).send("Missing medication");
     }
 
-    const deleteLogsSql = `
-    DELETE FROM linkingtable
-    WHERE medication_id = '${medicationId}'
-    AND user_Id = '${userId}'`;
-
-    db.query(deleteLogsSql, (err)=>{
-
-        if(err){
-            console.log(err);
-            return res.status(500).send("Delete medication logs failed");
-        }
-
         const deleteMedicationSql = `
         DELETE FROM medications
         WHERE id ='${medicationId}'
@@ -570,8 +586,7 @@ exports.deleteMedication = (req,res)=>{
 
             res.send("Medication deleted successfully");
         });
-    });
-}
+};
 
 //TEST
 exports.testMailer = (req, res) => {

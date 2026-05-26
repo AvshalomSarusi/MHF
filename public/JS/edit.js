@@ -2,6 +2,7 @@
 window.onload = function () {
     getLogs();
     loadMedicationsForDelete();
+    loadGuardianForDelete();
 };
 
 function getLogs() {
@@ -101,6 +102,57 @@ window.closeMenu = function (btn) {
     logsTableBody.style.display = "none";
 };
 
+function loadGuardianForDelete() {
+
+    fetch('/getGuardian')
+        .then(res => res.json())
+        .then(data => {
+
+            const select = document.getElementById("guardianToDelete");
+
+            select.innerHTML = `<option value ="" disabled selected hidden>Select Guardian</option>`;
+
+            data.forEach(guardian => {
+
+                const option = document.createElement("option");
+
+                option.value = guardian.id;
+                option.textContent = guardian.name;
+
+                select.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.log("Load guardians error:", err);
+        });
+};
+
+function deleteGuardian() {
+
+    const guardianID = document.getElementById("guardianToDelete").value;
+
+    if (!guardianID) {
+        alert("Please select guardian");
+        return;
+    }
+
+    fetch(`/deleteGuardian/${guardianID}`, {
+        method: "DELETE"
+    })
+
+        .then(res => res.text())
+        .then(msg => {
+
+            alert(msg);
+
+            loadGuardianForDelete();
+            getLogs();
+        })
+        .catch(err => {
+            console.log("Delete guardian error:", err);
+        });
+};
+
 function loadMedicationsForDelete() {
 
     fetch('/getMedications')
@@ -139,13 +191,13 @@ function deleteMedication() {
     })
 
         .then(res => res.text())
-        .then(msg =>{
+        .then(msg => {
 
             alert(msg);
             loadMedicationsForDelete();
             getLogs();
         })
-        .catch(err =>{
+        .catch(err => {
             console.log("Delete medication error:", err);
         });
-}
+};
