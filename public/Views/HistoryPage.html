@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+
+    <title>MHF Medication History</title>
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+
+<body>
+    <div class = "menu">
+        <button id="menueBtn">Menu</button>
+
+        <div id="menuItem" class="menu-items">
+            <button id="btnP" onclick="location.href='/p'">Profile</button>
+            <button id="btnE"onclick="location.href='/e'">Edit</button>
+            <button id="btnGM"onclick="location.href='/gm'">Guardian message</button>
+        </div>
+    </div>
+
+    <h2>Medication History</h2>
+
+    <p>Last 30 medication confirmations</p>
+
+    <table border="1">
+        <tr>
+            <th>Relative</th>
+            <th>Medication</th>
+            <th>Amount</th>
+            <th>Given by</th>
+            <th>Date</th>
+            <th>Time</th>
+        </tr>
+
+        <tbody id="historyTableBody"></tbody>
+    </table>
+
+    <script src="/JS/history.js"></script>
+    <script src="/JS/menu.js"></script>
+</body>
+
+</html>

@@ -636,7 +636,7 @@ exports.confirmMedication = (req, res) => {
 
     const checkTokenSql = `
     SELECT *
-    FROM medicatiOn_confirm_tokens
+    FROM medication_confirm_tokens
     WHERE token = '${token}'`;
 
     db.query(checkTokenSql, (err, result) => {
@@ -663,40 +663,63 @@ exports.confirmMedication = (req, res) => {
             return res.status(400).send("This confirmation link has expired");
         }
 
-        const insertSql = `
-        INSERT INTO data_medications
-        (user_id, id_c, id_m, id_g, amount, date, time)
-        VALUES
-        ('${tokenData.user_id}', '${tokenData.child_id}', '${tokenData.medication_id}',
-         '${tokenData.guardian_id}', '${tokenData.amount}', CURDATE(), CURTIME())`;
+        const getDosageSql = `
+        SELECT dosage
+        FROM linkingtable
+        WHERE user_id = '${tokenData.user_id}'
+        AND child_id = '${tokenData.child_id}'
+        AND medication_id = '${tokenData.medication_id}'
+        LIMIT 1`;
 
-         db.query(insertSql, (err, insertResult)=>{
-            
-            if(err){
+        db.query(getDosageSql, (err, dosageResult) => {
+
+            if (err) {
                 console.log(err);
-                return res.status(500).send("Failed to save medication confirmation");
+                return res.status(500).send("Failed to get medication dosage");
             }
 
-            const updateTokenSql =`
-            UPDATE medication_confirm_tokens
-            SET used = 1
-            WHERE id = '${tokenData.id}'`;
+            if (dosageResult.length === 0) {
+                return res.status(404).send("Medication task not found");
+            }
 
-            db.query(updateTokenSql,(err,updateResult)=>{
+            const realDosage = dosageResult[0].dosage;
 
-                if(err){
+            const insertSql = `
+            INSERT INTO data_medications
+            (user_id, id_c, id_m, id_g, amount, date, time)
+            VALUES
+            ('${tokenData.user_id}', '${tokenData.child_id}', '${tokenData.medication_id}',
+             '${tokenData.guardian_id}', '${realDosage}', CURDATE(), CURTIME())`;
+
+            db.query(insertSql, (err, insertResult) => {
+
+                if (err) {
                     console.log(err);
-                    return res.status(500).send("Confirmation saved, but token update failed");
+                    return res.status(500).send("Failed to save medication confirmation");
                 }
 
-                res.send(`
-                <h2>Medication confirmed successfuly</h2>
-                <p>Thank you. the confirmation was saved in the MHF system.</p>
-                `);
+                const updateTokenSql = `
+                UPDATE medication_confirm_tokens
+                SET used = 1
+                WHERE id = '${tokenData.id}'`;
+
+                db.query(updateTokenSql, (err, updateResult) => {
+
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).send("Confirmation saved, but token update failed");
+                    }
+
+                    res.send(`
+                    <h2>Medication confirmed successfuly</h2>
+                    <p>Thank you. the confirmation was saved in the MHF system.</p>
+                    `);
+                });
             });
-         });
+        });
     });
 };
+
 //MEDICATION
 exports.addMedication = (req, res) => {
 
@@ -822,6 +845,53 @@ exports.deleteMedication = (req, res) => {
         }
 
         res.send("Medication deleted successfully");
+    });
+};
+
+exports.getMedicationHistory = (req, res) => {
+
+    const userId = req.userId;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
+    const sql = `
+        SELECT
+        data_medications.id,
+        childe.name AS child_name,
+        medications.name AS medication_name,
+        guardian.name AS given_by,
+        data_medications.amount,
+        data_medications.\`date\` AS given_date,
+        data_medications.\`time\` AS given_time
+
+        FROM data_medications
+
+        JOIN childe
+        ON data_medications.id_c = childe.id
+
+        JOIN medications
+        ON data_medications.id_m = medications.id
+
+        LEFT JOIN guardian
+        ON data_medications.id_g = guardian.id
+
+        WHERE data_medications.user_id = '${userId}'
+
+        ORDER BY data_medications.\`date\` DESC,
+                 data_medications.\`time\` DESC
+
+        LIMIT 30`;
+
+    db.query(sql, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB error");
+        }
+
+        res.json(result);
     });
 };
 

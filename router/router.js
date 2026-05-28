@@ -48,10 +48,16 @@ router.get('/e', authMiddleware, (req,res)=>{
     res.sendFile(path.join(__dirname,'..', 'public', 'Views', 'EditPage.html'));
 });
 
+//File - HistoryPage.html
+router.get('/h', authMiddleware, (req,res)=>{
+    res.sendFile(path.join(__dirname,'..','public','Views','HistoryPage.html'));
+});
+
 //File - GuardianMessages.html
 router.get('/gm',authMiddleware,(req,res)=>{
     res.sendFile(path.join(__dirname,'..','public','Views','GuradianMessages.html'));
-})
+});
+
 //File - ChngePass.html
 router.get('/changePass', authMiddleware,(req,res)=>{
     res.sendFile(path.join(__dirname,'..','public','Views','ChngePass.html'));
@@ -72,6 +78,7 @@ router.post('/changePass', authMiddleware, userController.changePass);
 router.put('/updateLog/:id', authMiddleware, userController.updateLog);
 router.delete('/deleteLog/:id', authMiddleware, userController.deleteLog);
 router.post('/sendGuardianMessage',authMiddleware,userController.sendGuardianMessage);
+router.get('/getMedicationHistory', authMiddleware, userController.getMedicationHistory);
 
 //RELATIVE
 router.post('/addChild', authMiddleware, userController.addChild);

@@ -17,6 +17,7 @@
 
         <div id="menuItem" class="menu-items">
             <button id="btnE"onclick="location.href='/e'">Edit</button>
+            <button onclick="location.href='/h'">Medication History</button>
             <button id="btnGM"onclick="location.href='/gm'">Guardian message</button>
         </div>
     </div>
@@ -85,6 +86,9 @@
     </div><br><br>
 
     <!--טבלת המציגה את הנתונים של בן המשפחה והתרופה-->
+    <p>
+        This table shows the scheduled medication tasks for each relative, including the medication name, dosage, time, and assigned guardian.
+    </p>
     <div id="tableBox">
     <table border="1">
         <tr>
@@ -92,7 +96,7 @@
             <th>Medication</th>
             <th>Dosage</th>
             <th>Time to get</th>
-            <th>Gurdian</th>
+            <th>Guardian</th>
         </tr>
         <tbody id="logsTableBody"></tbody>
     </table>
