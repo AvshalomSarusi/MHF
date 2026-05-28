@@ -338,6 +338,34 @@ exports.getChildren = (req, res) => {
     });
 };
 
+exports.deleteRelative = (req, res) => {
+
+    const userId = req.userId;
+    const relativeId = req.params.id;
+
+    if (!relativeId) {
+        return res.satatus(400).send("Missing relative");
+    }
+
+    const deleteRelative = `
+    DELETE FROM childe
+    WHERE id ='${relativeId}'
+    AND user_id='${userId}'`;
+
+    db.query(deleteRelative, (err, result) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Delete relative failed");
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send("Relative not found");
+        }
+
+        res.send("Relative deleted successfuly");
+    });
+};
+
 //GUARDIAN
 exports.addGuardian = (req, res) => {
 
@@ -441,32 +469,32 @@ exports.addChildGuardian = (req, res) => {
     });
 };
 
-exports.deleteGuardian=(req,res)=>{
+exports.deleteGuardian = (req, res) => {
 
     const userId = req.userId;
     const guardianId = req.params.id;
 
-    if(!guardianId){
+    if (!guardianId) {
         return res.status(400).send("Missing guardian");
     }
-        const deleteGuardianSql = `
+    const deleteGuardianSql = `
         DELETE FROM guardian
         WHERE id ='${guardianId}'
         AND user_id='${userId}'`;
 
-        db.query(deleteGuardianSql,(err,result)=>{
+    db.query(deleteGuardianSql, (err, result) => {
 
-            if(err){
-                console.log(err);
-                return res.status(500).send("Delete guardian failed");
-            }
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Delete guardian failed");
+        }
 
-            if(result.affectedRows===0){
-                return res.status(404).send("Guardian not found");
-            }
+        if (result.affectedRows === 0) {
+            return res.status(404).send("Guardian not found");
+        }
 
-            res.send("Guardian deleted successfully");
-        });
+        res.send("Guardian deleted successfully");
+    });
 };
 
 //LOGS
@@ -591,33 +619,33 @@ exports.addMedicationType = (req, res) => {
     });
 };
 
-exports.deleteMedication = (req,res)=>{
+exports.deleteMedication = (req, res) => {
 
     const userId = req.userId;
     const medicationId = req.params.id;
 
-    if(!medicationId){
+    if (!medicationId) {
         return res.status(400).send("Missing medication");
     }
 
-        const deleteMedicationSql = `
+    const deleteMedicationSql = `
         DELETE FROM medications
         WHERE id ='${medicationId}'
         AND user_id = '${userId}'`;
 
-        db.query(deleteMedicationSql,(err,result)=>{
+    db.query(deleteMedicationSql, (err, result) => {
 
-            if(err){
-                console.log(err);
-                return res.status(500).send("Delete medication medication failed");
-            }
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Delete medication medication failed");
+        }
 
-            if(result.affectedRows === 0){
-                return res.status(404).send("Medication not found");
-            }
+        if (result.affectedRows === 0) {
+            return res.status(404).send("Medication not found");
+        }
 
-            res.send("Medication deleted successfully");
-        });
+        res.send("Medication deleted successfully");
+    });
 };
 
 //TEST

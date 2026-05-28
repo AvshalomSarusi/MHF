@@ -3,6 +3,7 @@ window.onload = function () {
     getLogs();
     loadMedicationsForDelete();
     loadGuardianForDelete();
+    loadRelativeForDelete()
 };
 
 function getLogs() {
@@ -199,5 +200,55 @@ function deleteMedication() {
         })
         .catch(err => {
             console.log("Delete medication error:", err);
+        });
+};
+
+function loadRelativeForDelete() {
+
+    fetch('/getChildren')
+        .then(res => res.json())
+        .then(data => {
+
+            const select = document.getElementById("relativeToDelete");
+
+            select.innerHTML = `<option value="" disabled selected hidden>Select Relative</option>`;
+
+            data.forEach(rel => {
+
+                const option = document.createElement("option");
+
+                option.value = rel.id;
+                option.textContent = rel.name;
+
+                select.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.log("Error load relative: ", err);
+        })
+}
+
+function deleteRelative() {
+
+    const relativeId = document.getElementById("relativeToDelete").value;
+
+    if (!relativeId) {
+        alert("Please select relative");
+        return;
+    }
+
+    fetch(`/deleteRelative/${relativeId}`, {
+        method: "DELETE"
+    })
+
+        .then(res => res.text())
+        .then(msg => {
+
+            alert(msg)
+            loadRelativeForDelete();
+            getLogs();
+        })
+        .catch(err => {
+            console.log("Delete relative err: ", err);
         });
 };

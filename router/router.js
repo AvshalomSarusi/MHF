@@ -71,6 +71,7 @@ router.delete('/deleteLog/:id', authMiddleware, userController.deleteLog);
 //RELATIVE
 router.post('/addChild', authMiddleware, userController.addChild);
 router.get('/getChildren', authMiddleware, userController.getChildren);
+router.delete('/deleteRelative/:id',authMiddleware,userController.deleteRelative);
 
 //GUARDIAN
 router.post('/addGuardian',authMiddleware, userController.addGuardian);
