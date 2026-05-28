@@ -48,6 +48,10 @@ router.get('/e', authMiddleware, (req,res)=>{
     res.sendFile(path.join(__dirname,'..', 'public', 'Views', 'EditPage.html'));
 });
 
+//File - GuardianMessages.html
+router.get('/gm',authMiddleware,(req,res)=>{
+    res.sendFile(path.join(__dirname,'..','public','Views','GuradianMessages.html'));
+})
 //File - ChngePass.html
 router.get('/changePass', authMiddleware,(req,res)=>{
     res.sendFile(path.join(__dirname,'..','public','Views','ChngePass.html'));
@@ -62,11 +66,12 @@ router.get('/register', (req, res) => {
 
 //USER
 router.post('/',userController.login);
-router.get('/getUser', authMiddleware, userController.getUser);
 router.post('/register', userController.createProfile);
+router.get('/getUser', authMiddleware, userController.getUser);
 router.post('/changePass', authMiddleware, userController.changePass);
 router.put('/updateLog/:id', authMiddleware, userController.updateLog);
 router.delete('/deleteLog/:id', authMiddleware, userController.deleteLog);
+router.post('/sendGuardianMessage',authMiddleware,userController.sendGuardianMessage);
 
 //RELATIVE
 router.post('/addChild', authMiddleware, userController.addChild);
@@ -87,6 +92,7 @@ router.delete('/deleteMedication/:id',authMiddleware,userController.deleteMedica
 
 //LOGS
 router.get('/getLogs',authMiddleware, userController.getLogs);
+router.get('/confirmMedication',userController.confirmMedication);
 
 //TEST
 router.get('/testMailer', userController.testMailer);

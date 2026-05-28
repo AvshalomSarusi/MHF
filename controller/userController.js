@@ -83,6 +83,10 @@ exports.changePass = (req, res) => {
 
     const { name, lname, email, pass1, pass2 } = req.body;
 
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
     if (!name || !lname || !email || !pass1 || !pass2) {
         return res.status(400).send("Missing required fields");
     }
@@ -180,6 +184,10 @@ exports.updateLog = (req, res) => {
     const userId = req.userId;
     const logId = req.params.id;
 
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
     const { dosage, scheduled_time } = req.body;
 
     if (!dosage || !scheduled_time) {
@@ -213,6 +221,10 @@ exports.updateLog = (req, res) => {
 exports.getUser = (req, res) => {
 
     const userId = req.userId;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     const sql =
         `SELECT firstname
@@ -295,11 +307,65 @@ exports.deleteLog = (req, res) => {
     });
 };
 
+exports.sendGuardianMessage = (req, res) => {
+
+    const userId = req.userId;
+    const guardianId = req.body.guardianId;
+    const subject = req.body.subject;
+    const message = req.body.message;
+
+    console.log(guardianId);
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
+    if (!guardianId || !subject || !message) {
+        return res.status(400).send("Missing message datails");
+    }
+
+    const sql = `
+    SELECT *
+    FROM guardian
+    WHERE id = '${guardianId}'
+    AND user_id = '${userId}'`;
+
+    db.query(sql, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB Error");
+        }
+
+        if (result.length === 0) {
+            return res.status(404).send("Guardian not found");
+        }
+
+        const guardian = result[0];
+        const fullMessage = `
+        ${message}
+        
+        --------------------------------------------
+        This email was sent through the MHF website.`;
+
+        sendMail(
+            guardian.email,
+            subject,
+            fullMessage
+        );
+
+        res.send("Message sent successfuly");
+    });
+}
 //CHILD
 exports.addChild = (req, res) => {
 
     const userId = req.userId;
     let { name } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!name) {
         return res.send("Name is required.");
@@ -325,6 +391,10 @@ exports.getChildren = (req, res) => {
 
     const userId = req.userId;
 
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
     const sql =
         `SELECT id,name FROM childe WHERE user_id = '${userId}'`;
 
@@ -342,6 +412,10 @@ exports.deleteRelative = (req, res) => {
 
     const userId = req.userId;
     const relativeId = req.params.id;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!relativeId) {
         return res.satatus(400).send("Missing relative");
@@ -371,6 +445,10 @@ exports.addGuardian = (req, res) => {
 
     const userId = req.userId;
     const { name, relationship, email } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!name || !relationship || !email) {
         return res.status(400).send("Missing required fields");
@@ -419,6 +497,10 @@ exports.getGuardian = (req, res) => {
 
     const userId = req.userId;
 
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
     const sql = `SELECT id, name From guardian WHERE user_id = '${userId}'`;
 
     db.query(sql, (err, result) => {
@@ -434,6 +516,10 @@ exports.addChildGuardian = (req, res) => {
 
     const userId = req.userId;
     const { child_id, guardian_id } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!child_id || !guardian_id) {
 
@@ -473,6 +559,10 @@ exports.deleteGuardian = (req, res) => {
 
     const userId = req.userId;
     const guardianId = req.params.id;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!guardianId) {
         return res.status(400).send("Missing guardian");
@@ -536,11 +626,86 @@ exports.getLogs = (req, res) => {
     console.log("GET LOGS RUNNING");
 };
 
+exports.confirmMedication = (req, res) => {
+
+    const token = req.query.token;
+
+    if (!token) {
+        return res.status(400).send("Missing confirmation token");
+    }
+
+    const checkTokenSql = `
+    SELECT *
+    FROM medicatiOn_confirm_tokens
+    WHERE token = '${token}'`;
+
+    db.query(checkTokenSql, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB Error");
+        }
+
+        if (result.length === 0) {
+            return res.status(404).send("Invalid confirmation link");
+        }
+
+        const tokenData = result[0];
+
+        if (tokenData.used === 1) {
+            return res.status(400).send("This confirmation link has used");
+        }
+
+        const now = new Date();
+        const expiresAt = new Date(tokenData.expires_at);
+
+        if (now > expiresAt) {
+            return res.status(400).send("This confirmation link has expired");
+        }
+
+        const insertSql = `
+        INSERT INTO data_medications
+        (user_id, id_c, id_m, id_g, amount, date, time)
+        VALUES
+        ('${tokenData.user_id}', '${tokenData.child_id}', '${tokenData.medication_id}',
+         '${tokenData.guardian_id}', '${tokenData.amount}', CURDATE(), CURTIME())`;
+
+         db.query(insertSql, (err, insertResult)=>{
+            
+            if(err){
+                console.log(err);
+                return res.status(500).send("Failed to save medication confirmation");
+            }
+
+            const updateTokenSql =`
+            UPDATE medication_confirm_tokens
+            SET used = 1
+            WHERE id = '${tokenData.id}'`;
+
+            db.query(updateTokenSql,(err,updateResult)=>{
+
+                if(err){
+                    console.log(err);
+                    return res.status(500).send("Confirmation saved, but token update failed");
+                }
+
+                res.send(`
+                <h2>Medication confirmed successfuly</h2>
+                <p>Thank you. the confirmation was saved in the MHF system.</p>
+                `);
+            });
+         });
+    });
+};
 //MEDICATION
 exports.addMedication = (req, res) => {
 
     const userId = req.userId;
     const { child_id, medication, dosage, timeToSend } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!child_id || !medication || !dosage || !timeToSend) {
         return res.send("All fields are required");
@@ -569,6 +734,10 @@ exports.getMedications = (req, res) => {
 
     const userId = req.userId;
 
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
     const sql = `SELECT id, name FROM medications WHERE user_id = '${userId}'`;
 
     db.query(sql, (err, results) => {
@@ -581,6 +750,10 @@ exports.addMedicationType = (req, res) => {
 
     const userId = req.userId;
     const { name, antibiotic } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!name) {
         return res.send("Medication name required");
@@ -623,6 +796,10 @@ exports.deleteMedication = (req, res) => {
 
     const userId = req.userId;
     const medicationId = req.params.id;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
 
     if (!medicationId) {
         return res.status(400).send("Missing medication");

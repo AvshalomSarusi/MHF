@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const db = require('../dbConfig');
 const sendMail = require('./mailer');
 const message = require('../utils/message');
+const crypto = require('crypto');
 
 //בודק כל דקה
 cron.schedule('* * * * *', () => {
@@ -11,39 +12,40 @@ cron.schedule('* * * * *', () => {
     const now = new Date();
 
     const currentTime =
-        now.getHours().toString().padStart(2, '0')//אם האורך קטן מ2 תוסיף 0 בהתחלה לצורך הדוגמא אם 7 אז 07.
-        +
-        ":"
-        +
+        now.getHours().toString().padStart(2, '0') +
+        ":" +
         now.getMinutes().toString().padStart(2, '0');
 
     console.log(`CRON CHECKING NOW: ${currentTime}`);
 
-    const sql = 
-    `SELECT
-    linkingtable.id,
-    childe.name AS child_name,
-    medications.name AS medication_name,
-    linkingtable.dosage,
-    linkingtable.scheduled_time,
-    guardian.name AS guardian_name,
-    guardian.email AS guardian_email
+    const sql = `
+        SELECT
+        linkingtable.id,
+        linkingtable.user_id,
+        linkingtable.child_id,
+        linkingtable.medication_id,
+        child_guardian.guardian_id,
+        childe.name AS child_name,
+        medications.name AS medication_name,
+        linkingtable.dosage,
+        linkingtable.scheduled_time,
+        guardian.name AS guardian_name,
+        guardian.email AS guardian_email
+        FROM linkingtable
 
-    FROM linkingtable
+        JOIN childe
+        ON linkingtable.child_id = childe.id
 
-    JOIN childe
-    ON linkingtable.child_id = childe.id
+        JOIN medications
+        ON linkingtable.medication_id = medications.id
 
-    JOIN medications
-    ON linkingtable.medication_id = medications.id
+        JOIN child_guardian
+        ON linkingtable.child_id = child_guardian.child_id
 
-    JOIN child_guardian
-    ON linkingtable.child_id = child_guardian.child_id
+        JOIN guardian
+        ON child_guardian.guardian_id = guardian.id
 
-    JOIN guardian
-    ON child_guardian.guardian_id = guardian.id
-
-    WHERE TIME_FORMAT(linkingtable.scheduled_time, '%H:%i') = ? `;
+        WHERE TIME_FORMAT(linkingtable.scheduled_time, '%H:%i') = ?`;
 
     db.query(sql, [currentTime], (err, results) => {
 
@@ -56,26 +58,58 @@ cron.schedule('* * * * *', () => {
             return;
         }
 
-            results.forEach(row => {
+        results.forEach(row => {
 
-            const msg = message.medicationReminder(
-                row.guardian_name,
-                row.child_name,
-                row.medication_name,
-                row.dosage,
-                currentTime
-            );
-        
-            sendMail(
-                row.guardian_email,
-                msg.subject,
-                msg.text
-            );
-        
-            console.log("Reminder sent to:", row.guardian_email);
+            const token = crypto.randomBytes(32).toString('hex');
 
+            const insertTokenSql = `
+                INSERT INTO medication_confirm_tokens
+                (token, user_id, child_id, medication_id, guardian_id, amount, expires_at)
+                VALUES
+                (
+                    '${token}',
+                    '${row.user_id}',
+                    '${row.child_id}',
+                    '${row.medication_id}',
+                    '${row.guardian_id}',
+                    '${row.dosage}',
+                    DATE_ADD(NOW(), INTERVAL 24 HOUR)
+                )
+            `;
+
+            db.query(insertTokenSql, (err, tokenResult) => {
+
+                if (err) {
+                    console.log("TOKEN INSERT ERROR:", err);
+                    return;
+                }
+
+                const confirmLink = `http://localhost:3002/confirmMedication?token=${token}`;
+
+                const msg = message.medicationReminder(
+                    row.guardian_name,
+                    row.child_name,
+                    row.medication_name,
+                    row.dosage,
+                    currentTime
+                );
+
+                const fullText = `
+                ${msg.text}
+
+                Click here to confirm that the child received the medication:
+                ${confirmLink}`;
+
+                sendMail(
+                    row.guardian_email,
+                    msg.subject,
+                    fullText
+                );
+
+                console.log("Token created:", token);
+                console.log("Reminder sent to:", row.guardian_email);
+            });
         });
-
     });
 
 }, {

@@ -16,3 +16,7 @@ function showProfile() {
 function showEdit() {
     console.log("Edit clicked");
 }
+
+function showGuardianMessages(){
+    console.log("Guardian messages clicked");
+}

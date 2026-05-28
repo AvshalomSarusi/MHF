@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+
+    <title>MHF Messages</title>
+    <link rel="stylesheet" href="/CSS/guardianMessages.css">
+</head>
+
+<body>
+    <div class="menu">
+        <button id="menueBtn">Menu</button>
+
+        <div id="menuItem" class="menu-items">
+            <button id="btnP" onclick="location.href='/p'">Profile</button>
+            <button id="btnE" onclick="location.href='/e'">Edit</button>
+        </div>
+    </div>
+    <div id="guardianMessagesBox">
+        <h2>Send message to guardian</h2>
+
+        <select id="guardianSelect">
+            <option value="" disabled selected hidden>Select Guardian</option>
+        </select>
+        <br><br>
+        <input type="text" id="messageSubject" placeholder="Subject">
+        <br><br>
+        <textarea id="messageBody" placeholder="Write your message here"></textarea>
+        <br><br>
+        <button onclick="sendGuardianToMessage()">Send Message</button>
+
+    </div>
+    <script src="/JS/guardianMessages.js"></script>
+    <script src="/JS/menu.js"></script>
+</body>
