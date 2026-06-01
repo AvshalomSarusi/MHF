@@ -61,12 +61,16 @@ cron.schedule('* * * * *', () => {
         results.forEach(row => {
 
             const token = crypto.randomBytes(32).toString('hex');
+            const today = new Date().toISOString().slice(0, 10);
+            const batchId = `${row.id}_${row.scheduled_time}_${today}`;
 
             const insertTokenSql = `
                 INSERT INTO medication_confirm_tokens
-                (token, user_id, child_id, medication_id, guardian_id, amount, expires_at)
+                (task_id, batch_id, token, user_id, child_id, medication_id, guardian_id, amount, expires_at)
                 VALUES
                 (
+                    '${row.id}',
+                    '${batchId}',
                     '${token}',
                     '${row.user_id}',
                     '${row.child_id}',

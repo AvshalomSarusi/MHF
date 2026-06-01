@@ -19,7 +19,7 @@ function loadMedicationHistory() {
                 tr.innerHTML = `
                     <td>${row.child_name}</td>
                     <td>${row.medication_name}</td>
-                    <td>${row.amount}mg</td>
+                    <td>${row.amount}</td>
                     <td>${row.given_by || "-"}</td>
                     <td>${new Date(row.given_date).toLocaleDateString('he-IL')}</td>
                     <td>${row.given_time}</td>`;
