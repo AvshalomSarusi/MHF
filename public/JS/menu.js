@@ -1,22 +1,31 @@
 const menuBtn = document.getElementById("menueBtn");
 const menuItems = document.getElementById("menuItem");
 
-menuBtn.addEventListener("click", () => {
-    if (menuItems.style.display === "block") {
-        menuItems.style.display = "none";
-    } else {
-        menuItems.style.display = "block";
-    }
-});
+fetch('/getRole')
+    .then(res => res.json())
+    .then(data => {
 
-function showProfile() {
-    console.log("Profile clicked");
-}
+        if (data.role === 'admin') {
+            document.body.classList.add('admin');
 
-function showEdit() {
-    console.log("Edit clicked");
-}
+            if (menuItems) {
+                menuItems.style.display = "flex";
+            }
 
-function showGuardianMessages(){
-    console.log("Guardian messages clicked");
-}
+            if (menuBtn) {
+                menuBtn.style.display = "none";
+            }
+
+            return;
+        }
+
+        if (menuBtn && menuItems) {
+            menuBtn.addEventListener("click", () => {
+                if (menuItems.style.display === "block") {
+                    menuItems.style.display = "none";
+                } else {
+                    menuItems.style.display = "block";
+                }
+            });
+        }
+    });

@@ -33,6 +33,15 @@ db.connect((err) => {
 
 //----------------------------------------------------------PAGES----------------------------------------------------------
 
+//File - AdminPage
+router.get('/a',authMiddleware,(req,res)=>{
+
+    if(req.role!=='admin'){
+        return res.status(403).send("Access denied");
+    }
+    res.sendFile(path.join(__dirname,'..','public', 'Views', 'AdminPage.html'));
+});
+
 //File - LoginPage.html
 router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'LoginPage.html'));
@@ -69,6 +78,24 @@ router.get('/register', (req, res) => {
 });
 
 //----------------------------------------------------------PATHS----------------------------------------------------------
+
+router.get('/home',authMiddleware,(req,res)=>{
+
+    if(req.role === 'admin'){
+        return res.redirect('/a');
+    }
+
+    res.redirect('/p');
+});
+
+router.get('/getRole',authMiddleware,(req,res)=>{
+    res.json({role: req.role})
+});
+
+router.get('/logout', (req, res) => {
+    res.clearCookie('mhf_user');
+    res.redirect('/');
+});
 
 //USER
 router.post('/',userController.login);

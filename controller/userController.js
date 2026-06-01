@@ -146,7 +146,7 @@ exports.login = (req, res) => {
 
     const { nickname, pass } = req.body;
 
-    if(!nickname || pass){
+    if(!nickname || !pass){
         return res.status(400).send("Missing login datails");
     }
     if (!formatName(nickname)) {
@@ -175,7 +175,7 @@ exports.login = (req, res) => {
                 sameSite: 'strict'
             });
 
-            res.redirect('/p');
+            res.redirect('/home');
         } else {
             res.send("Incorrect username or password.");
         }
@@ -749,6 +749,53 @@ exports.confirmMedication = (req, res) => {
     });
 };
 
+exports.getMedicationHistory = (req, res) => {
+
+    const userId = req.userId;
+
+    if (!userId) {
+        return res.status(401).send("No logged in");
+    }
+
+    const sql = `
+        SELECT
+        data_medications.id,
+        childe.name AS child_name,
+        medications.name AS medication_name,
+        guardian.name AS given_by,
+        data_medications.amount,
+        data_medications.\`date\` AS given_date,
+        data_medications.\`time\` AS given_time
+
+        FROM data_medications
+
+        JOIN childe
+        ON data_medications.id_c = childe.id
+
+        JOIN medications
+        ON data_medications.id_m = medications.id
+
+        LEFT JOIN guardian
+        ON data_medications.id_g = guardian.id
+
+        WHERE data_medications.user_id = '${userId}'
+
+        ORDER BY data_medications.\`date\` DESC,
+                 data_medications.\`time\` DESC
+
+        LIMIT 30`;
+
+    db.query(sql, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB error");
+        }
+
+        res.json(result);
+    });
+};
+
 //MEDICATION
 exports.addMedication = (req, res) => {
 
@@ -876,53 +923,6 @@ exports.deleteMedication = (req, res) => {
         }
 
         res.send("Medication deleted successfully");
-    });
-};
-
-exports.getMedicationHistory = (req, res) => {
-
-    const userId = req.userId;
-
-    if (!userId) {
-        return res.status(401).send("No logged in");
-    }
-
-    const sql = `
-        SELECT
-        data_medications.id,
-        childe.name AS child_name,
-        medications.name AS medication_name,
-        guardian.name AS given_by,
-        data_medications.amount,
-        data_medications.\`date\` AS given_date,
-        data_medications.\`time\` AS given_time
-
-        FROM data_medications
-
-        JOIN childe
-        ON data_medications.id_c = childe.id
-
-        JOIN medications
-        ON data_medications.id_m = medications.id
-
-        LEFT JOIN guardian
-        ON data_medications.id_g = guardian.id
-
-        WHERE data_medications.user_id = '${userId}'
-
-        ORDER BY data_medications.\`date\` DESC,
-                 data_medications.\`time\` DESC
-
-        LIMIT 30`;
-
-    db.query(sql, (err, result) => {
-
-        if (err) {
-            console.log(err);
-            return res.status(500).send("DB error");
-        }
-
-        res.json(result);
     });
 };
 
