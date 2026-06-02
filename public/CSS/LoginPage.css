@@ -8,6 +8,9 @@ body {
 h1{
     text-align: center;
 }
+p{
+    text-align: center;
+}
 #input {
     text-align: center; /* יישור תוכן הטקסט במרכז */
 }

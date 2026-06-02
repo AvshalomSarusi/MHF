@@ -146,7 +146,7 @@ exports.login = (req, res) => {
 
     const { nickname, pass } = req.body;
 
-    if(!nickname || !pass){
+    if (!nickname || !pass) {
         return res.status(400).send("Missing login datails");
     }
     if (!formatName(nickname)) {
@@ -428,22 +428,42 @@ exports.deleteRelative = (req, res) => {
         return res.status(400).send("Missing relative");
     }
 
-    const deleteRelative = `
-    DELETE FROM childe
-    WHERE id ='${relativeId}'
-    AND user_id='${userId}'`;
+    const checkTasksSql = `
+        SELECT id
+        FROM linkingtable
+        WHERE child_id = ?
+        AND user_id = ?
+        LIMIT 1`;
 
-    db.query(deleteRelative, (err, result) => {
+    db.query(checkTasksSql, [relativeId, userId], (err, taskResult) => {
+
         if (err) {
             console.log(err);
-            return res.status(500).send("Delete relative failed");
+            return res.status(500).send("DB error");
         }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).send("Relative not found");
+        if (taskResult.length > 0) {
+            return res.status(409).send("Cannot delete relative. please delete task first");
         }
 
-        res.send("Relative deleted successfuly");
+        const deleteRelativeSql = `
+            DELETE FROM childe
+            WHERE id = ?
+            AND user_id = ?`;
+
+        db.query(deleteRelativeSql, [relativeId, userId], (err, result) => {
+
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Delete relative failed");
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).send("Relative not found");
+            }
+
+            res.send("Relative deleted successfully");
+        });
     });
 };
 
@@ -533,31 +553,48 @@ exports.addChildGuardian = (req, res) => {
         return res.status(400).send("Missing data");
     }
 
-    const checkSql =
-        `SELECT *
+    const checkTaskSql = `
+    SELECT child_id
+    FROM linkingtable
+    WHERE child_id = ?
+    AND user_id = ?`;
+
+    db.query(checkTaskSql, [child_id, userId], (err, taskResult) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB Error");
+        }
+        if (taskResult.length === 0) {
+            return res.status(404).send("Child not found in task table");
+        }
+
+        const checkSql =
+            `SELECT *
         FROM child_guardian
         WHERE child_id = '${child_id}'
         AND guardian_id = '${guardian_id}'
         AND user_id = '${userId}'`;
 
-    db.query(checkSql, (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("BD check error");
-        }
-        if (result.length > 0) {
-            return res.send("Guardian already linked to this relative");
-        }
-        const insertSql =
-            `INSERT INTO child_guardian (user_id, child_id, guardian_id)
+        db.query(checkSql, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("BD check error");
+            }
+            if (result.length > 0) {
+                return res.send("Guardian already linked to this relative");
+            }
+            const insertSql =
+                `INSERT INTO child_guardian (user_id, child_id, guardian_id)
         VALUES ('${userId}','${child_id}','${guardian_id}')`;
 
-        db.query(insertSql, (err) => {
-            if (err) {
-                console.log("DB insert error");
-            }
-            res.send("Guardian linked successfuly");
+            db.query(insertSql, (err) => {
+                if (err) {
+                    console.log("DB insert error");
+                }
+                res.send("Guardian linked successfuly");
 
+            });
         });
     });
 };
@@ -574,23 +611,40 @@ exports.deleteGuardian = (req, res) => {
     if (!guardianId) {
         return res.status(400).send("Missing guardian");
     }
-    const deleteGuardianSql = `
-        DELETE FROM guardian
-        WHERE id ='${guardianId}'
-        AND user_id='${userId}'`;
 
-    db.query(deleteGuardianSql, (err, result) => {
+    const checkTasksSql = `
+    SELECT guardian_id
+    FROM child_guardian
+    WHERE guardian_id = ?
+    AND user_id = ? `;
 
+    db.query(checkTasksSql, [guardianId, userId], (err, taskResult) => {
         if (err) {
             console.log(err);
-            return res.status(500).send("Delete guardian failed");
+            return res.status(500).send("DB Error");
+        }
+        if (taskResult.length > 0) {
+            return res.status(409).send("Cannot delete guardian. please delete task first");
         }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).send("Guardian not found");
-        }
+        const deleteGuardianSql = `
+        DELETE FROM guardian
+        WHERE id = ?
+        AND user_id= ?`;
 
-        res.send("Guardian deleted successfully");
+        db.query(deleteGuardianSql, [guardianId, userId], (err, result) => {
+
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Delete guardian failed");
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).send("Guardian not found");
+            }
+
+            res.send("Guardian deleted successfully");
+        });
     });
 };
 
@@ -710,38 +764,89 @@ exports.confirmMedication = (req, res) => {
                     return res.status(404).send("Medication task not found");
                 }
 
-                const realDosage = dosageResult[0].dosage;
+                const childeNameSql = `
+               SELECT name 
+               FROM childe
+               WHERE id = '${tokenData.child_id}'`
 
-                const insertSql = `
-                    INSERT INTO data_medications
-                    (user_id, id_c, id_m, id_g, amount, date, time)
-                    VALUES
-                    ('${tokenData.user_id}', '${tokenData.child_id}', '${tokenData.medication_id}',
-                     '${tokenData.guardian_id}', '${realDosage}', CURDATE(), CURTIME())`;
-
-                db.query(insertSql, (err, insertResult) => {
-
+                db.query(childeNameSql, (err, childResult) => {
                     if (err) {
                         console.log(err);
-                        return res.status(500).send("Failed to save medication confirmation");
+                        return res.status(500).send("DB Error");
+                    }
+                    if (childResult.length === 0) {
+                        return res.status(404).send("Child not found");
                     }
 
-                    const updateTokenSql = `
-                    UPDATE medication_confirm_tokens
-                    SET used = 1
-                    WHERE batch_id = '${tokenData.batch_id}'`;
 
-                    db.query(updateTokenSql, (err, updateResult) => {
+                    const guardianNameSql = `
+                    SELECT name
+                    FROM guardian
+                    WHERE id = '${tokenData.guardian_id}'`;
 
+                    db.query(guardianNameSql, (err, guardianResult) => {
                         if (err) {
                             console.log(err);
-                            return res.status(500).send("Confirmation saved, but token update failed");
+                            return res.status(500).send("DB Error");
+                        }
+                        if (guardianResult.length === 0) {
+                            return res.status(404).send("Guanrdian not found");
                         }
 
-                        res.send(`
-                            <h2>Medication confirmed successfully</h2>
-                            <p>Thank you. The confirmation was saved in the MHF system.</p>
-                        `);
+
+
+                        const medicationNameSql = `
+                        SELECT name
+                        FROM medications
+                        WHERE id = '${tokenData.medication_id}'`;
+
+                        db.query(medicationNameSql, (err, medicationResult) => {
+                            if (err) {
+                                console.log(err);
+                                return res.status(500).send("DB Error");
+                            }
+                            if (medicationResult.length === 0) {
+                                return res.status(404).send("Medication not found");
+                            }
+
+                            const childName = childResult[0].name;
+                            const guardianName = guardianResult[0].name;
+                            const medicationName = medicationResult[0].name;
+                            const realDosage = dosageResult[0].dosage;
+
+                            const insertSql = `
+                                INSERT INTO data_medications
+                                (user_id, id_c, child_name, id_m, medication_name, id_g, guardian_name, amount, date, time)
+                                VALUES
+                                ('${tokenData.user_id}', '${tokenData.child_id}', '${childName}', '${tokenData.medication_id}',
+                                 '${medicationName}', '${tokenData.guardian_id}', '${guardianName}', '${realDosage}', CURDATE(), CURTIME())`;
+
+                            db.query(insertSql, (err, insertResult) => {
+
+                                if (err) {
+                                    console.log(err);
+                                    return res.status(500).send("Failed to save medication confirmation");
+                                }
+
+                                const updateTokenSql = `
+                                UPDATE medication_confirm_tokens
+                                SET used = 1
+                                WHERE batch_id = '${tokenData.batch_id}'`;
+
+                                db.query(updateTokenSql, (err, updateResult) => {
+
+                                    if (err) {
+                                        console.log(err);
+                                        return res.status(500).send("Confirmation saved, but token update failed");
+                                    }
+
+                                    res.send(`
+                                        <h2>Medication confirmed successfully</h2>
+                                        <p>Thank you. The confirmation was saved in the MHF system.</p>
+                                    `);
+                                });
+                            });
+                        });
                     });
                 });
             });
@@ -759,24 +864,15 @@ exports.getMedicationHistory = (req, res) => {
 
     const sql = `
         SELECT
-        data_medications.id,
-        childe.name AS child_name,
-        medications.name AS medication_name,
-        guardian.name AS given_by,
-        data_medications.amount,
+        id,
+        child_name,
+        medication_name,
+        guardian_name AS given_by,
+        amount,
         data_medications.\`date\` AS given_date,
         data_medications.\`time\` AS given_time
 
         FROM data_medications
-
-        JOIN childe
-        ON data_medications.id_c = childe.id
-
-        JOIN medications
-        ON data_medications.id_m = medications.id
-
-        LEFT JOIN guardian
-        ON data_medications.id_g = guardian.id
 
         WHERE data_medications.user_id = '${userId}'
 
@@ -805,7 +901,7 @@ exports.addMedication = (req, res) => {
     if (!userId) {
         return res.status(401).send("No logged in");
     }
-    if(dosage.length<=0){
+    if (dosage.length <= 0) {
         return res.status(400).send("Dosage must be greater than 0");
     }
     if (!child_id || !medication || !dosage || !timeToSend) {
@@ -906,23 +1002,41 @@ exports.deleteMedication = (req, res) => {
         return res.status(400).send("Missing medication");
     }
 
-    const deleteMedicationSql = `
+    const checkTaskSql = `
+    SELECT id
+    FROM linkingtable
+    WHERE medication_id = ?
+    AND user_id = ?
+    LIMIT 1`;
+
+    db.query(checkTaskSql, [medicationId, userId], (err, taskResult) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("DB Error");
+        }
+        if (taskResult.length > 0) {
+            return res.status(409).send("Cannot delete medication. please delete task first")
+        }
+
+        const deleteMedicationSql = `
         DELETE FROM medications
         WHERE id ='${medicationId}'
         AND user_id = '${userId}'`;
 
-    db.query(deleteMedicationSql, (err, result) => {
+        db.query(deleteMedicationSql, (err, result) => {
 
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Delete medication medication failed");
-        }
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Delete medication medication failed");
+            }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).send("Medication not found");
-        }
+            if (result.affectedRows === 0) {
+                return res.status(404).send("Medication not found");
+            }
 
-        res.send("Medication deleted successfully");
+            res.send("Medication deleted successfully");
+        });
     });
 };
 
