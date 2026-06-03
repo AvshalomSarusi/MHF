@@ -4,83 +4,8 @@ const router = express.Router();
 
 const userController = require('../controller/userController');
 const authMiddleware = require('../middleware/authMiddleware');
-const sendMail = require('../utils/mailer');
 
 //----------------------------------------------------------PAGES----------------------------------------------------------
-
-//File - AdminPage
-router.get('/a', authMiddleware, (req, res) => {
-
-    if (req.role !== 'admin') {
-
-        const userId = req.userId;
-
-        const userSql = `
-            SELECT id, firstname, lastname, email, role
-            FROM users
-            WHERE id = '${userId}'
-        `;
-
-        db.query(userSql, (err, userResult) => {
-
-            if (err) {
-                console.log(err);
-                return res.status(500).send("DB Error");
-            }
-
-            if (userResult.length === 0) {
-                return res.status(403).send("Access denied");
-            }
-
-            const user = userResult[0];
-
-            const adminSql = `
-                SELECT email
-                FROM users
-                WHERE role = 'admin'
-            `;
-
-            db.query(adminSql, (err2, adminResult) => {
-
-                if (err2) {
-                    console.log(err2);
-                    return res.status(500).send("DB Error");
-                }
-
-                const subject = "Security Alert - Unauthorized Admin Page Access Attempt";
-
-                const text = `
-                Security Alert
-
-                A non-admin user tried to access the admin page.
-
-                User details:
-                ID: ${user.id}
-                First name: ${user.firstname}
-                Last name: ${user.lastname}
-                Email: ${user.email}
-                Role: ${user.role}
-
-                Attempt details:
-                Page: /a
-                Date: ${new Date().toLocaleString()}
-                IP: ${req.ip}
-
-                This email was sent automatically by the MHF system.`;
-
-                adminResult.forEach(admin => {
-                    sendMail(admin.email, subject, text);
-                });
-
-                return res.status(403).send("Access denied");
-            });
-        });
-
-        return;
-    }
-
-    res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'AdminPage.html'));
-});
 
 //File - LoginPage.html
 router.get('/', (req, res) => {
