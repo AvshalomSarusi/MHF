@@ -1,36 +1,10 @@
 const express = require('express');
-const db = require('../dbConfig');
 const path = require('path');
-const coockieParser = require('cookie-parser');
+const router = express.Router();
 
-const port = 3002;
-
-require('../utils/cronJobs');
-
-const router = express();
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-router.use(coockieParser());
-router.use(express.static(path.join(__dirname, '..', 'public')));
 const userController = require('../controller/userController');
 const authMiddleware = require('../middleware/authMiddleware');
 const sendMail = require('../utils/mailer');
-
-
-//Server
-router.listen(port, () => {
-    console.log(`Server is lesten http://localhost:${port}`);
-
-});
-
-//DB Connected
-db.connect((err) => {
-    if (err) {
-        console.error("Database connection faild:", err.massage);
-    } else {
-        console.log("Connction to my SQL database.");
-    }
-});
 
 //----------------------------------------------------------PAGES----------------------------------------------------------
 
@@ -196,3 +170,5 @@ router.get('/confirmMedication', userController.confirmMedication);
 
 //TEST
 router.get('/testMailer', userController.testMailer);
+
+module.exports = router;
