@@ -33,3 +33,29 @@ exports.runQuery = (req, res) => {
         res.json(safeResult);
     });
 };
+
+exports.getDashboardStats  = (req, res) => {
+
+    console.log("getDashboardStats in controler is run");
+    const sql = `
+        SELECT
+        (SELECT COUNT(*) FROM users) AS totalUsers,
+        (SELECT COUNT(*) FROM childe) AS totalChildren,
+        (SELECT COUNT(*) FROM guardian) AS totalGuardians,
+        (SELECT COUNT(*) FROM medications) AS totalMedications `;
+
+    db.query(sql, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Failed to load dashboard stats");
+        }
+
+        res.json({
+            totalUsers: result[0].totalUsers,
+            totalChildren:result[0].totalChildren,
+            totalGuardians: result[0].totalGuardians,
+            totalMedications: result[0].totalMedications
+        });
+    });
+};

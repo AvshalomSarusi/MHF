@@ -17,5 +17,6 @@ router.get('/a', authMiddleware, adminMiddleware, (req, res) => {
 
 //----------------------------------------------------------PATHS----------------------------------------------------------
 router.post('/admin/runQuery', authMiddleware, adminMiddleware, adminController.runQuery );
+router.get('/admin/dashboardStats',authMiddleware,adminMiddleware,adminController.getDashboardStats );
 
 module.exports = router;

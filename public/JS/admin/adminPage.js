@@ -2,7 +2,12 @@ const sqlQueryInput = document.getElementById('sqlQueryInput');
 const runQueryBtn = document.getElementById('runQueryBtn');
 const queryResult = document.getElementById('queryResult');
 
-const runQuery = () => {
+window.onload = function(){
+    
+    loadDashboardStats();
+};
+
+function runQuery() {
 
     const sqlQuery = sqlQueryInput.value.trim();
 
@@ -32,6 +37,30 @@ const runQuery = () => {
         })
         .catch(err => {
             queryResult.textContent = err.message;
+        });
+};
+
+function loadDashboardStats() {
+
+    console.log("loadDashboardStats in adminPage is run");
+    fetch('/admin/dashboardStats')
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(msg => {
+                    throw new Error(msg);
+                });
+            }
+
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('totalUsers').textContent = data.totalUsers;
+            document.getElementById('totalChildren').textContent = data.totalChildren;
+            document.getElementById('totalGuardians').textContent = data.totalGuardians;
+            document.getElementById('totalMedications').textContent = data.totalMedications;
+        })
+        .catch(err => {
+            console.log(err);
         });
 };
 
