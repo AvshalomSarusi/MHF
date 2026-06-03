@@ -158,8 +158,8 @@ exports.login = (req, res) => {
 
     const sql =
         `SELECT * FROM users
-    WHERE firstname = '${nickname}'
-    AND password = '${pass}'`;
+        WHERE firstname = '${nickname}'
+        AND password = '${pass}'`;
 
     db.query(sql, (err, result) => {
         if (err) {

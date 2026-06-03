@@ -1,35 +1,51 @@
-body {
-    font-family: Arial, sans-serif;
-}
-
-.tabs button {
-    margin: 5px;
-    padding: 10px;
-    cursor: pointer;
-}
-
-.hidden {
-    display: none;
-}
-
-table {
-    border-collapse: collapse;
-    width: 10%;
-}
-
-th,
-td {
-    border: 1px solid black;
-    padding: 8px;
+.admin-query-box {
+    width: 70%;
+    margin: 80px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #f8f8f8;
     text-align: center;
 }
 
-.form-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.admin-query-box h2 {
+    margin-bottom: 15px;
 }
 
+#sqlQueryInput {
+    width: 100%;
+    height: 160px;
+    resize: vertical;
+    padding: 12px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#runQueryBtn {
+    margin-top: 15px;
+    padding: 10px 25px;
+    cursor: pointer;
+}
+
+#queryResultBox {
+    margin-top: 25px;
+    width: 100%;
+    min-height: 180px;
+    max-height: 350px;
+    border: 1px solid #999;
+    background-color: white;
+    overflow-x: auto;
+    overflow-y: auto;
+    text-align: left;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+#queryResult {
+    white-space: pre;
+    font-family: Consolas, monospace;
+    font-size: 15px;
+}
 .menu-items {
     display: flex;
     justify-content: center;

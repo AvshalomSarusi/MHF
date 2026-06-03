@@ -19,6 +19,17 @@
         <button id="btnGM" onclick="location.href='/gm'">Guardian message</button>
         <button onclick="location.href='/logout'">Logout</button>
     </div>
+
+    <div class="admin-query-box">
+        <h2>Database Query Panel</h2>
+        <textarea id="sqlQueryInput" placeholder="Write your SQL query here..."></textarea>   
+        <button id="runQueryBtn">Run Query</button>
+        <div id="queryResultBox">
+            <pre id="queryResult"></pre>
+        </div>
+    
+    </div>
+    <script src="/JS/admin/adminPage.js"></script>
     <script src="/JS/menu.js"></script>
 </body>
 
