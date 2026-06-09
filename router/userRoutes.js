@@ -37,11 +37,15 @@ router.get('/changePass', authMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'ChngePass.html'));
 });
 
-//Register page
+//File - Register.html
 router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'Views', 'Register.html'));
 });
 
+//File - ChildCard.html
+router.get('/ccp',authMiddleware,(req,res)=>{
+    res.sendFile(path.join(__dirname,'..','public','Views','ChildCard.html'));
+})
 //----------------------------------------------------------PATHS----------------------------------------------------------
 
 router.get('/home', authMiddleware, (req, res) => {
@@ -69,6 +73,7 @@ router.get('/getUser', authMiddleware, userController.getUser);
 router.post('/changePass', authMiddleware, userController.changePass);
 router.put('/updateLog/:id', authMiddleware, userController.updateLog);
 router.delete('/deleteLog/:id', authMiddleware, userController.deleteLog);
+router.get('/childeCard/:name', authMiddleware, userController.getChildCard);
 router.post('/sendGuardianMessage', authMiddleware, userController.sendGuardianMessage);
 router.get('/getMedicationHistory', authMiddleware, userController.getMedicationHistory);
 
@@ -76,6 +81,7 @@ router.get('/getMedicationHistory', authMiddleware, userController.getMedication
 router.post('/addChild', authMiddleware, userController.addChild);
 router.get('/getChildren', authMiddleware, userController.getChildren);
 router.delete('/deleteRelative/:id', authMiddleware, userController.deleteRelative);
+router.put('/updateChildData/:id', authMiddleware, userController.updateChildData);
 
 //GUARDIAN
 router.post('/addGuardian', authMiddleware, userController.addGuardian);

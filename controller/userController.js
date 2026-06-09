@@ -467,6 +467,54 @@ exports.deleteRelative = (req, res) => {
     });
 };
 
+exports.updateChildData = (req, res) => {
+
+    const userId = req.userId;
+    const childId = req.params.id;
+    const { weight, height } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("Not logged in");
+    }
+
+    if (!childId) {
+        return res.status(400).send("Missing child id");
+    }
+
+    if (!weight || !height) {
+        return res.status(400).send("Missing weight or height");
+    }
+
+    const weightNumber = Number(weight);
+    const heightNumber = Number(height);
+
+    if (isNaN(weightNumber) || isNaN(heightNumber)) {
+        return res.status(400).send("Weight and height must be numbers");
+    }
+
+    const sql = `
+        UPDATE childe
+        SET weight = ?,
+            height = ?
+        WHERE id = ?
+        AND user_id = ?
+    `;
+
+    db.query(sql, [weightNumber, heightNumber, childId, userId], (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Update child data failed");
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send("Child not found");
+        }
+
+        res.send("Child data updated successfully");
+    });
+};
+
 //GUARDIAN
 exports.addGuardian = (req, res) => {
 
@@ -889,6 +937,46 @@ exports.getMedicationHistory = (req, res) => {
         }
 
         res.json(result);
+    });
+};
+
+exports.getChildCard = (req, res) => {
+
+    console.log("getChildCard function is running");
+
+    const userId = req.userId;
+    const childName = req.params.name;
+
+    console.log("childName:", childName);
+    console.log("userId:", userId);
+    
+    if(!userId){
+        return res.status(401).send("Not logged in");
+    }
+
+    if(!childName){
+        return res.status(400).send("Missing child id");
+    }
+
+    const sql=`
+    SELECT name, weight, height
+    FROM childe
+    WHERE  name = ?
+    AND user_id = ?
+    LIMIT 1`;
+
+    db.query(sql,[childName,userId],(err,result)=>{
+
+        if(err){
+            console.log(err);
+            return res.status(500).send("DB Error");
+        }
+
+        if(result.length === 0 ){
+            return res.status(404).send("Child not found");
+        }
+
+        res.json(result[0]);
     });
 };
 

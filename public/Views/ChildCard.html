@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+
+    <title>MHF Relative info</title>
+    <link rel="stylesheet" href="/CSS/chileCard.css">
+</head>
+
+<body>
+    <h2>Relative info page</h2>
+    <!--טבלת עריכה ומחיקת מסימות-->
+    <div class="menu">
+        <button id="menueBtn">Menu</button>
+
+        <div id="menuItem" class="menu-items">
+            <button id="btnP" onclick="location.href='/p'">Profile</button>
+            <button onclick="location.href='/e'">Edit</button>
+            <button onclick="location.href='/h'">Medication History</button>
+            <button id="btnGM" onclick="location.href='/gm'">Guardian message</button>
+            <button onclick="location.href='/logout'">Logout</button>
+        </div><br>
+    </div>
+
+        <div class="child-search-box">
+            <input id="name" type="text" placeholder="name of relative">
+            <button id="SearchBtn">Search</button>
+        </div>
+        <div id="card"></div>
+
+        <script src="/JS/childCard.js"></script>
+        <script src="/JS/menu.js"></script>
+</body>
+
+</html>

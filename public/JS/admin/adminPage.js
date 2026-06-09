@@ -3,7 +3,6 @@ const runQueryBtn = document.getElementById('runQueryBtn');
 const queryResult = document.getElementById('queryResult');
 
 window.onload = function(){
-    
     loadDashboardStats();
 };
 

@@ -18,6 +18,7 @@
 
         <div id="menuItem" class="menu-items">
             <button id="btnP" onclick="location.href='/p'">Profile</button>
+            <button onclick="location.href='/ccp'">Relative card</button>
             <button onclick="location.href='/h'">Medication History</button>
             <button id="btnGM"onclick="location.href='/gm'">Guardian message</button>
             <button onclick="location.href='/logout'">Logout</button>
@@ -41,8 +42,25 @@
             <tbody id="logsTableBody"></tbody>
         </table>
     </div>   
-     <h2>Delete information and data</h2>
     <hr>
+    <h2>Update information and data</h2>
+    <p>You can update the selected relative's weight and height here.</p>
+
+    <select id="childToUpdate">
+        <option value="" disabled selected hidden>Select Relative</option>
+    </select>
+
+    <input id="childWeight" type="number" step="0.01" placeholder="Weight kg">
+    <input id="childHeight" type="number" step="0.01" placeholder="Height cm">
+
+    <button onclick="updateRelativeData()">Update Child</button>
+
+    <p id="updateChildMsg"></p>
+</div>
+    <hr>
+     <h2>Delete information and data</h2>
+    
+    <!--עריכת גובהה ומשקל לבן משפחה-->
     <!--מחיקת שמרטפים-->
     <div id="deleteGuardianBox">
         <p>Delete guardian</p>
@@ -53,7 +71,7 @@
     
         <button onclick="deleteGuardian()">Delete Guardian</button>
     </div>
-    <hr>
+
     <!--בחירת תרופה ומחיקתה-->
     <div id="deleteMedicationBox">
         <p>Delete medication</p>
@@ -62,7 +80,7 @@
         </select>
         <button onclick="deleteMedication()">Delete Medication</button>
     </div>
-    <hr>
+
     <!--מחיקת בן משפחה-->
     <div id="deleteRelativeBox">
         <p>Delete relative</p>
@@ -71,7 +89,7 @@
         </select>
         <button onclick="deleteRelative()">Delete Relative</button>
     </div>
-    <hr>
+
     <script src="/JS/edit.js"></script>
     <script src="/JS/menu.js"></script>
 </body>

@@ -3,7 +3,6 @@ const path = require('path');
 
 const router = express.Router();
 
-const db = require('../dbConfig');
 const authMiddleware = require('../middleware/authMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
 const adminController = require('../controller/adminController');

@@ -3,7 +3,11 @@ window.onload = function () {
     getLogs();
     loadMedicationsForDelete();
     loadGuardianForDelete();
-    loadRelativeForDelete()
+    loadRelativeForDelete();
+    loadRelativeForUpdate();
+};
+window.closeMenu = function (btn) {
+    logsTableBody.style.display = "none";
 };
 
 function getLogs() {
@@ -97,10 +101,6 @@ function editLog(id, currentDosage, currentTime) {
             alert(err.message);
             console.log("Update error:", err);
         });
-};
-
-window.closeMenu = function (btn) {
-    logsTableBody.style.display = "none";
 };
 
 function loadGuardianForDelete() {
@@ -250,5 +250,81 @@ function deleteRelative() {
         })
         .catch(err => {
             console.log("Delete relative err: ", err);
+        });
+};
+
+function loadRelativeForUpdate(){
+
+    fetch('/getChildren')
+    .then(res=> res.json())
+    .then(data=>{
+
+        const select = document.getElementById("childToUpdate");
+
+        select.innerHTML =`
+        <option value="" disabled selected hidden>Select Relative</option>`;
+
+        data.forEach(child =>{
+
+            const option = document.createElement("option");
+
+            option.value=child.id;
+            option.textContent = child.name;
+
+            select.appendChild(option);
+        });
+    })
+    .catch(err=>{
+        console.log(err);
+    });
+};
+
+function updateRelativeData() {
+
+    const childSelect = document.getElementById("childToUpdate");
+    const weightInput = document.getElementById("childWeight");
+    const heightInput = document.getElementById("childHeight");
+    const msg = document.getElementById("updateChildMsg");
+
+    const childId = childSelect.value;
+    const weight = weightInput.value;
+    const height = heightInput.value;
+
+    if (!childId) {
+        msg.textContent = "Please select relative";
+        return;
+    }
+
+    if (!weight || !height) {
+        msg.textContent = "Please enter weight and height";
+        return;
+    }
+
+    fetch(`/updateChildData/${childId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ weight, height })
+    })
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(message => {
+                    throw new Error(message);
+                });
+            }
+
+            return res.text();
+        })
+        .then(data => {
+            alert("Child data updated successfully");
+
+            childSelect.value = "";
+            weightInput.value = "";
+            heightInput.value = "";
+
+        })
+        .catch(err => {
+            msg.textContent = err.message;
         });
 };
