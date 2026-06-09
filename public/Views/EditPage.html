@@ -17,10 +17,11 @@
         <button id="menueBtn">Menu</button>
 
         <div id="menuItem" class="menu-items">
-            <button id="btnP" onclick="location.href='/p'">Profile</button>
+            <button onclick="location.href='/p'">Profile</button>
             <button onclick="location.href='/ccp'">Relative card</button>
             <button onclick="location.href='/h'">Medication History</button>
-            <button id="btnGM"onclick="location.href='/gm'">Guardian message</button>
+            <button onclick="location.href='/gm'">Guardian message</button>
+            <button onclick="location.href='/changePass'">Change password</button>
             <button onclick="location.href='/logout'">Logout</button>
         </div>
     </div>
@@ -46,14 +47,15 @@
     <h2>Update information and data</h2>
     <p>You can update the selected relative's weight and height here.</p>
 
+    <div id="updateChildDataActions">
     <select id="childToUpdate">
         <option value="" disabled selected hidden>Select Relative</option>
     </select>
-
     <input id="childWeight" type="number" step="0.01" placeholder="Weight kg">
     <input id="childHeight" type="number" step="0.01" placeholder="Height cm">
 
     <button onclick="updateRelativeData()">Update Child</button>
+    </div>
 
     <p id="updateChildMsg"></p>
 </div>
