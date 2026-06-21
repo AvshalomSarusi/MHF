@@ -1,0 +1,429 @@
+/* =====================================================================
+   My Healthy Family — Shared Design System
+   "Sage & Terracotta" — a calm, warm, trustworthy health aesthetic.
+   Loaded on every page BEFORE the page-specific stylesheet.
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ---------------------------------------------------------------------
+   Design tokens
+--------------------------------------------------------------------- */
+:root {
+    /* Brand + surface palette */
+    --bg:            #f4f1ea;   /* warm cream canvas */
+    --bg-tint:       #ece7db;   /* slightly deeper cream */
+    --surface:       #fffdf8;   /* card surface (warm white) */
+    --surface-2:     #f8f5ee;   /* subtle inset surface */
+
+    --ink:           #21302b;   /* primary text (deep green-charcoal) */
+    --ink-soft:      #5d6b63;   /* secondary text */
+    --ink-faint:     #8a9389;   /* hints / placeholders */
+
+    --primary:       #16715f;   /* evergreen — main action / trust */
+    --primary-deep:  #0d4f41;
+    --primary-tint:  #e2efe9;   /* soft green wash */
+    --primary-ring:  rgba(22, 113, 95, 0.30);
+
+    --accent:        #d56a45;   /* warm terracotta — human accent */
+    --accent-deep:   #b14f2f;
+    --accent-tint:   #f6e5da;
+
+    --danger:        #b23b3b;   /* destructive actions */
+    --danger-tint:   #f6e0de;
+
+    --line:          #e4dfd2;   /* warm hairline borders */
+    --line-strong:   #d6cfbe;
+
+    /* Radius scale */
+    --r-sm:  10px;
+    --r:     16px;
+    --r-lg:  22px;
+    --r-pill: 999px;
+
+    /* Shadows — soft, green-tinted depth */
+    --shadow-sm: 0 1px 2px rgba(20, 50, 42, 0.06);
+    --shadow:    0 6px 18px rgba(20, 50, 42, 0.09), 0 1px 3px rgba(20, 50, 42, 0.05);
+    --shadow-lg: 0 18px 44px rgba(20, 50, 42, 0.16);
+
+    /* Type */
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body:    'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------------
+   Reset + base
+--------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background-color: var(--bg);
+    /* gentle atmospheric wash so pages never feel like flat white */
+    background-image:
+        radial-gradient(1100px 520px at 12% -8%, var(--primary-tint) 0%, transparent 60%),
+        radial-gradient(900px 480px at 108% 4%, var(--accent-tint) 0%, transparent 55%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+::selection {
+    background: var(--primary);
+    color: #fff;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0 0 0.5em;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h3 { font-size: 1.15rem; }
+
+p { margin: 0 0 1rem; }
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-deep); }
+
+hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 38px 0;
+}
+
+/* ---------------------------------------------------------------------
+   Brand wordmark
+--------------------------------------------------------------------- */
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+}
+
+.brand:hover { color: var(--primary-deep); }
+
+.brand::before {
+    content: "";
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    background: linear-gradient(150deg, var(--primary), var(--accent));
+    box-shadow: var(--shadow-sm);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 21s-7.5-4.9-10-9.2C.2 8.4 1.9 4.7 5.4 4.7c2 0 3.4 1.2 4.1 2.4h1c.7-1.2 2.1-2.4 4.1-2.4 3.5 0 5.2 3.7 3.4 7.1C19.5 16.1 12 21 12 21z'/%3E%3C/svg%3E") center / 80% no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 21s-7.5-4.9-10-9.2C.2 8.4 1.9 4.7 5.4 4.7c2 0 3.4 1.2 4.1 2.4h1c.7-1.2 2.1-2.4 4.1-2.4 3.5 0 5.2 3.7 3.4 7.1C19.5 16.1 12 21 12 21z'/%3E%3C/svg%3E") center / 80% no-repeat;
+}
+
+/* Brand pinned to the top-left of in-app pages */
+.app-brand {
+    position: absolute;
+    top: 22px;
+    left: 26px;
+    z-index: 900;
+}
+
+body.admin .app-brand { display: none; }
+
+/* ---------------------------------------------------------------------
+   Buttons (bare <button> defaults to the primary action look)
+--------------------------------------------------------------------- */
+button {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: var(--r-pill);
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: transform 0.15s var(--ease), background 0.18s var(--ease),
+                box-shadow 0.18s var(--ease), border-color 0.18s var(--ease);
+    box-shadow: var(--shadow-sm);
+}
+
+button:hover {
+    background: var(--primary-deep);
+    border-color: var(--primary-deep);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+button:active { transform: translateY(0); }
+
+button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--primary-ring);
+}
+
+/* ---------------------------------------------------------------------
+   Form controls
+--------------------------------------------------------------------- */
+input,
+select,
+textarea {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    padding: 11px 14px;
+    transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+
+input::placeholder,
+textarea::placeholder { color: var(--ink-faint); }
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-ring);
+}
+
+select { cursor: pointer; }
+
+textarea { resize: vertical; line-height: 1.5; }
+
+input[type="time"],
+input[type="number"] { color-scheme: light; }
+
+/* ---------------------------------------------------------------------
+   Tables
+--------------------------------------------------------------------- */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background: var(--surface);
+    border-radius: var(--r);
+    overflow: hidden;
+    font-size: 0.92rem;
+}
+
+/* neutralise the legacy border="1" attribute on the markup */
+table[border] { border: 0; }
+
+th, td {
+    padding: 13px 14px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+}
+
+th {
+    background: var(--primary-tint);
+    color: var(--primary-deep);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+tbody tr { transition: background 0.15s var(--ease); }
+tbody tr:hover { background: var(--surface-2); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* compact, neutral buttons inside table cells (Edit / Delete / Save / Close) */
+td button {
+    padding: 7px 14px;
+    font-size: 0.82rem;
+    color: var(--primary-deep);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    box-shadow: none;
+}
+
+td button:hover {
+    background: var(--primary-tint);
+    color: var(--primary-deep);
+    border-color: var(--primary);
+}
+
+/* ---------------------------------------------------------------------
+   Shared "panel" surface (cards / boxes across pages)
+--------------------------------------------------------------------- */
+.panel,
+#tableBox,
+.table-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 26px;
+    box-shadow: var(--shadow);
+}
+
+#tableBox,
+.table-box {
+    width: min(95%, 1000px);
+    margin: 34px auto;
+}
+
+#tableBox p { color: var(--ink-soft); margin-bottom: 18px; }
+
+/* ---------------------------------------------------------------------
+   Navigation menu (shared by all in-app user pages)
+--------------------------------------------------------------------- */
+.menu {
+    position: absolute;
+    top: 20px;
+    right: 22px;
+    z-index: 950;
+}
+
+#menueBtn {
+    padding: 10px 20px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-sm);
+}
+
+#menueBtn::after { content: " ☰"; }
+
+#menueBtn:hover {
+    background: var(--surface);
+    color: var(--primary-deep);
+    border-color: var(--primary);
+}
+
+.menu-items {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 210px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    animation: rise 0.18s var(--ease);
+}
+
+.menu-items button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 2px 0;
+    padding: 10px 14px;
+    font-weight: 500;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    box-shadow: none;
+}
+
+.menu-items button:hover {
+    background: var(--primary-tint);
+    color: var(--primary-deep);
+    border-color: transparent;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ---------------------------------------------------------------------
+   Admin top bar (admin sees the full nav as a fixed bar)
+--------------------------------------------------------------------- */
+body.admin { padding-top: 78px; }
+
+body.admin .menu,
+body.admin #menuItem.menu-items {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 12px 18px;
+    background: rgba(255, 253, 248, 0.92);
+    backdrop-filter: blur(8px);
+    border: none;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: var(--shadow-sm);
+    animation: none;
+    z-index: 1000;
+}
+
+body.admin .menu-items button {
+    width: auto;
+    min-width: 118px;
+    text-align: center;
+    margin: 0;
+    padding: 9px 16px;
+}
+
+body.admin #menueBtn { display: none; }
+
+/* ---------------------------------------------------------------------
+   Page title treatment (in-app pages)
+--------------------------------------------------------------------- */
+body:not(.auth) > h1,
+body:not(.auth) > h2 {
+    text-align: center;
+    margin: 76px auto 8px;
+    max-width: 900px;
+    padding: 0 20px;
+}
+
+body:not(.auth) > h2 + p,
+body:not(.auth) > p {
+    text-align: center;
+    color: var(--ink-soft);
+    max-width: 680px;
+    margin: 0 auto 26px;
+    padding: 0 20px;
+}
+
+/* ---------------------------------------------------------------------
+   Animations
+--------------------------------------------------------------------- */
+@keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   Utilities
+--------------------------------------------------------------------- */
+.hidden { display: none !important; }

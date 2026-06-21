@@ -1,32 +1,116 @@
-body {
-    margin: 0;
-    height: 100vh; /* גובה של כל המסך */
-    /*display: flex;*/
-    justify-content: center; /* ממרכז אופקית */
-    align-items: center; /* ממרכז אנכית */
-}
-h1{
-    text-align: center;
-}
-p{
-    text-align: center;
-}
-#input {
-    text-align: center; /* יישור תוכן הטקסט במרכז */
+/* =====================================================================
+   Auth pages — Login & Change Password
+   (relies on theme.css for tokens, fonts and base elements)
+   ===================================================================== */
+
+body.auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    /* richer, layered atmosphere for the entry screens */
+    background-image:
+        radial-gradient(820px 540px at 18% 0%, var(--primary-tint) 0%, transparent 58%),
+        radial-gradient(760px 520px at 96% 12%, var(--accent-tint) 0%, transparent 55%),
+        radial-gradient(900px 700px at 50% 120%, #e8efe7 0%, transparent 60%);
 }
 
-input {
-    padding: 5px;
-    margin: 10px 0; /* רווח בין האינפוטים */
-    text-align: center;
-}
-button{
-    border: solid , 2px , lightskyblue;
-}
-
+/* floating "create account" action */
 #createAccount {
-    position: absolute; /* מניח את הכפתור בצורה מוחלטת */
-    top: 20px; /* מציב את הכפתור בחלק העליון */
-    right: 20px; /* מציב את הכפתור בצד ימין של המסך */
+    position: fixed;
+    top: 22px;
+    right: 24px;
+    z-index: 10;
 }
 
+#createAccount button {
+    background: var(--surface);
+    color: var(--primary-deep);
+    border: 1px solid var(--line-strong);
+}
+
+#createAccount button:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    color: var(--primary-deep);
+}
+
+/* ---- the card ---- */
+.auth-card {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 40px 38px 34px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: rise 0.5s var(--ease) both;
+}
+
+.auth-card .brand {
+    font-size: 1.18rem;
+    margin-bottom: 22px;
+}
+
+.auth-card h1 {
+    font-size: clamp(1.7rem, 4vw, 2.2rem);
+    margin-bottom: 8px;
+}
+
+.auth-card .auth-sub {
+    color: var(--ink-soft);
+    margin-bottom: 26px;
+}
+
+/* form */
+.auth-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
+}
+
+/* the markup uses <br> between fields — hide so flex gap controls spacing */
+.auth-card form br { display: none; }
+
+.auth-card input {
+    width: 100%;
+    padding: 13px 15px;
+    text-align: left;
+}
+
+.auth-card form button[type="submit"] {
+    margin-top: 6px;
+    padding: 13px;
+    font-size: 1rem;
+}
+
+/* password rule / helper text inside the form */
+.auth-card form p {
+    margin: 2px 0 4px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 12px 14px;
+}
+
+/* footnotes (cookies / logout reminder) */
+.auth-note {
+    margin: 22px auto 0;
+    max-width: 420px;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--ink-faint);
+    text-align: center;
+}
+
+.auth-note strong { color: var(--ink-soft); }
+
+@media (max-width: 480px) {
+    .auth-card { padding: 32px 24px 28px; }
+}

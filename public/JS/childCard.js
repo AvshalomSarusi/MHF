@@ -24,11 +24,11 @@ function logChildInfo(){
         .then(child=>{
 
             card.innerHTML = `
-            <div class = "child-card">
-            <h3>${child.name}<h3>
-            <p><strong>Weight:</strong> ${child.weight} kg</p>
-            <p><strong>Height:</strong> ${child.height} cm</p>
-            <div>`;
+            <div class="child-card">
+                <h3>${child.name}</h3>
+                <p><strong>Weight:</strong> ${child.weight} kg</p>
+                <p><strong>Height:</strong> ${child.height} cm</p>
+            </div>`;
 
         })
         .catch(err =>{

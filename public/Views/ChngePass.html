@@ -5,24 +5,30 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>MHF change password</title>
+    <link rel="stylesheet" href="/CSS/theme.css">
     <link rel="stylesheet" href="/CSS/LoginPage.css">
 </head>
 
-<body>
-    <h1>Chane your password</h1>
-    <div id="input">
-        <p>Enter the details</p>
-        <form action="/changePass" method="post">
-            <input type="text" id="name" name="name" placeholder="Nickname"></input><br>
-            <input type="text" id="lname" name="lname" placeholder="Last name"></input><br>
-            <input type ="email" id="email" name="email" placeholder="Email"></input><br>
-            <input type="password" id="pass1" name="pass1" placeholder="Old password"></input><br>
-            <input type="password" id="pass2" name="pass2" placeholder=" New password."></input><br>
-            <button type="submit">Change your password</button>
-        </form>
-    </div>
+<body class="auth">
+    <main class="auth-shell">
+        <section class="auth-card">
+            <span class="brand">My Healthy Family</span>
+            <h1>Change your password</h1>
+            <p class="auth-sub">Enter your details to set a new password.</p>
+
+            <form action="/changePass" method="post">
+                <input type="text" id="name" name="name" placeholder="Nickname"><br>
+                <input type="text" id="lname" name="lname" placeholder="Last name"><br>
+                <input type="email" id="email" name="email" placeholder="Email"><br>
+                <input type="password" id="pass1" name="pass1" placeholder="Old password"><br>
+                <input type="password" id="pass2" name="pass2" placeholder="New password"><br>
+                <button type="submit">Change password</button>
+            </form>
+        </section>
+    </main>
 </body>
 
 </html>

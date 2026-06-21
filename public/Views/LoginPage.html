@@ -5,26 +5,37 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>MHF login</title>
+    <link rel="stylesheet" href="/CSS/theme.css">
     <link rel="stylesheet" href="/CSS/LoginPage.css">
 </head>
 
-<body>
-    <h1>Welcom to MHF web login page</h1><!--My Healthy Family-->
+<body class="auth">
+    <!--My Healthy Family-->
     <div id="createAccount">
-        <button id="regbutt" onclick="window.location.href='/register'"> Create Account </button>
+        <button id="regbutt" onclick="window.location.href='/register'">Create account</button>
     </div>
-    <div id="input">
-        <p>pleas put your name and your password</p>
-        <form action="/" method="post">
-            <input type="text" id="nickname" name="nickname" placeholder="First name"></input><br>
-            <input type="password" id="pass" name="pass" placeholder="Password"></input><br>
-            <button type="submit">Send</button>
-        </form>
-    </div>
-    <p>This site uses essential cookies for secure login and user identification.</p>
-    <p><strong>Important:</strong> Please remember to log out of the system when you finish using the website.</p>
+
+    <main class="auth-shell">
+        <section class="auth-card">
+            <span class="brand">My Healthy Family</span>
+            <h1>Welcome back</h1>
+            <p class="auth-sub">Sign in to keep your family's medication on schedule.</p>
+
+            <form action="/" method="post">
+                <input type="text" id="nickname" name="nickname" placeholder="First name"><br>
+                <input type="password" id="pass" name="pass" placeholder="Password"><br>
+                <button type="submit">Sign in</button>
+            </form>
+
+            <p class="auth-note">
+                This site uses essential cookies for secure login and user identification.<br>
+                <strong>Important:</strong> please remember to log out when you finish using the website.
+            </p>
+        </section>
+    </main>
 </body>
 
 </html>

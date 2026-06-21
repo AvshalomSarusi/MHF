@@ -1,246 +1,91 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 25px;
-    background-color: #f7f7f7;
-    color: #222;
-}
+/* =====================================================================
+   Profile & Medication History
+   (menu, tables, panels, page titles come from theme.css)
+   ===================================================================== */
 
-h2 {
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 25px;
-}
-
-/* =========================
-   GENERAL
-========================= */
-
-.hidden {
-    display: none;
-}
-
-hr {
-    margin: 35px 0;
-    border: none;
-    border-top: 1px solid #ccc;
-}
-
-p {
-    text-align: center;
-    font-size: 16px;
-}
-
-/* =========================
-   MENU
-========================= */
-
-.menu {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: inline-block;
-}
-
-#menueBtn {
-    padding: 10px 18px;
-    cursor: pointer;
-}
-
-.menu-items {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: -15%;
-    margin-top: 5px;
-    background-color: white;
-    border: 1px solid black;
-    padding: 5px;
-    z-index: 1000;
-}
-
-.menu-items button {
-    display: block;
-    width: 100%;
-    margin-bottom: 5px;
-    padding: 8px 12px;
-    cursor: pointer;
-}
-
-/* =========================
-   ADMIN MENU
-========================= */
-
-body.admin {
-    padding-top: 70px;
-}
-
-body.admin .menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 100%;
-    background-color: white;
-    border-bottom: 1px solid #ccc;
-    padding: 10px;
-    box-sizing: border-box;
-    z-index: 1000;
-}
-
-body.admin .menu-items {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-
-    position: static;
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-
-body.admin .menu-items button {
-    display: inline-block;
-    width: auto;
-    min-width: 120px;
-    margin-bottom: 0;
-    padding: 10px 15px;
-    cursor: pointer;
-}
-
-body.admin #menueBtn {
-    display: none;
-}
-
-/* =========================
-   ADD BUTTONS
-========================= */
-
+/* ---- "Add Relative / Add Medication" actions ---- */
 #addButton {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin: 35px auto 35px auto;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 8px auto 30px;
 }
 
 #addButton button {
-    display: inline-block;
-    width: auto;
-    min-width: 150px;
-    margin-bottom: 0;
-    padding: 10px 15px;
-    border: 1px solid #333;
-    background-color: #eeeeee;
-    color: #222;
-    cursor: pointer;
-    font-size: 16px;
-    text-align: center;
+    min-width: 170px;
+    background: var(--surface);
+    color: var(--primary-deep);
+    border: 1px solid var(--line-strong);
 }
 
 #addButton button:hover {
-    background-color: #e0e0e0;
+    background: var(--primary-tint);
+    color: var(--primary-deep);
+    border-color: var(--primary);
 }
 
-/* =========================
-   FORMS / INPUT ROWS
-========================= */
+/* ---- inline "add" tables (relative / medication) ---- */
+#relativeTable,
+#medicationTable {
+    width: min(92%, 560px);
+    margin: 4px auto 30px;
+    box-shadow: var(--shadow);
+    border-radius: var(--r);
+    overflow: hidden;
+}
 
+/* ---- standalone tables (e.g. medication history) ---- */
+body > table {
+    width: min(95%, 1000px);
+    margin: 10px auto 44px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+}
+
+#relativeTable td,
+#medicationTable td { padding: 12px; }
+
+#relativeTable input,
+#medicationTable input,
+#medicationTable select { width: 100%; }
+
+/* ---- form rows (events / guardians) ---- */
 .form-row {
-    width: 90%;
-    max-width: 850px;
-    margin: 25px auto;
-    background-color: white;
+    width: min(92%, 860px);
+    margin: 6px auto 28px;
     padding: 22px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .form-row input,
-.form-row select {
-    padding: 10px;
-    border: 1px solid #bbb;
-    border-radius: 8px;
-    font-size: 15px;
-}
+.form-row select { flex: 1 1 170px; min-width: 150px; }
 
-.form-row button {
-    padding: 10px 18px;
-    border: 1px solid #333;
-    border-radius: 8px;
-    background-color: white;
-    cursor: pointer;
-}
+.form-row button { flex: 0 0 auto; }
 
-.form-row button:hover {
-    background-color: #f0f0f0;
-}
+/* the "All day in time -" label text sits inline in the markup */
+.form-row { color: var(--ink-soft); font-size: 0.9rem; }
 
-/* =========================
-   TABLES
-========================= */
+/* table inside the logs box should not double up shadows */
+#tableBox table { box-shadow: none; border: 1px solid var(--line); }
 
-#tableBox {
-    margin: 40px auto;
-    width: 95%;
-    background-color: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    background-color: white;
-}
-
-th,
-td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-}
-
-th {
-    background-color: #eeeeee;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 700px) {
-    body {
-        padding: 15px;
-    }
-
-    #addButton {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    #addButton button {
-        width: 90%;
-    }
-
-    .form-row {
-        flex-direction: column;
-    }
-
+/* ---- responsive ---- */
+@media (max-width: 720px) {
+    .form-row { flex-direction: column; align-items: stretch; }
     .form-row input,
     .form-row select,
-    .form-row button {
-        width: 90%;
-    }
+    .form-row button { width: 100%; flex: 1 1 auto; }
 
-    #tableBox {
-        overflow-x: auto;
-    }
+    #addButton { flex-direction: column; align-items: center; }
+    #addButton button { width: min(92%, 360px); }
+
+    #tableBox, body > table { overflow-x: auto; display: block; }
 }

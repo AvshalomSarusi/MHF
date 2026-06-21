@@ -4,27 +4,30 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>MHF Register</title>
-        <link rel="stylesheet" href="css/register.css">
+        <link rel="stylesheet" href="/CSS/theme.css">
+        <link rel="stylesheet" href="/CSS/LoginPage.css">
+        <link rel="stylesheet" href="/CSS/Register.css">
     </head>
-    <body>
-        <h1><p>Welcome to the registration page.<br>
-            We hope you enjoy what we have to offer.</p></h1>
-            <form method="POST" action="/register">
-                <input name="name" id="name" type="text" placeholder="First name" required></input><br>
-                <input name="last" id="ln" type="text" placeholder="Last Name" required></input><br>
-                <input name="email" id="em" type="email" placeholder="Email" required></input><br>
-                <!--[!@#$%^&*.?][A-Z][a-z]*\d{6,8}-->
-                <p>The password must start with one of the following characters: !@#$%^&*.?
+    <body class="auth">
+        <main class="auth-shell">
+            <section class="auth-card">
+                <span class="brand">My Healthy Family</span>
+                <h1><p>Create your account</p></h1>
+                <p class="auth-sub">We hope you enjoy what we have to offer.</p>
 
-                    Then it must contain one uppercase letter between A and Z.
-                    
-                    If desired, lowercase letters between a and z may be added without limit.
-                    
-                    Finally, it must contain between 6 and 8 digits.</p>
-                <input name="pass" id="pass" type="password" placeholder="Password" minlength="6" required><br>
-                <button type="submit" >Sign up</button>
-              </form>
+                <form method="POST" action="/register">
+                    <input name="name" id="name" type="text" placeholder="First name" required><br>
+                    <input name="last" id="ln" type="text" placeholder="Last name" required><br>
+                    <input name="email" id="em" type="email" placeholder="Email" required><br>
+                    <!--[!@#$%^&*.?][A-Z][a-z]*\d{6,8}-->
+                    <p>The password must start with one of: !@#$%^&amp;*.? &mdash; then one uppercase letter (A&ndash;Z). Lowercase letters (a&ndash;z) are optional, and it must end with 6 to 8 digits.</p>
+                    <input name="pass" id="pass" type="password" placeholder="Password" minlength="6" required><br>
+                    <button type="submit">Sign up</button>
+                </form>
+            </section>
+        </main>
     </body>
 </html>
