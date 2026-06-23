@@ -50,13 +50,13 @@ function loadUser() {
 createRelativeBtn.addEventListener("click", openRelativeRow);
 
 function openRelativeRow() {
-    
-    if (medicationTable.style.display === "table"){
+
+    if (medicationTable.style.display === "table") {
 
         medicationTable.style.display = "none";
-        medicationTableBody.innerHTML="";
+        medicationTableBody.innerHTML = "";
     }
-        
+
     if (relativeTable.style.display !== "none") return;
 
     relativeTable.style.display = "table";
@@ -149,10 +149,10 @@ createMedicationBtn.addEventListener("click", openMedicationRow);
 
 function openMedicationRow() {
 
-    if (relativeTable.style.display === "table"){
+    if (relativeTable.style.display === "table") {
 
         relativeTable.style.display = "none";
-        relativeTableBody.innerHTML="";
+        relativeTableBody.innerHTML = "";
     }
 
     if (medicationTable.style.display !== "none") return;
@@ -180,8 +180,8 @@ window.saveMedication = function (btn) {
 
     const row = btn.parentNode.parentNode;
 
-    const name = row.children[0].children[0].value;
-    const antibiotic = row.children[0].children[0].value;
+    const name = row.children[0].children[0].value.trim();
+    const antibiotic = row.children[1].children[0].value;
 
     if (!name) {
         alert("Medication name is required");

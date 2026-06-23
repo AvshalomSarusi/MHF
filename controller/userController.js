@@ -949,30 +949,30 @@ exports.getChildCard = (req, res) => {
 
     console.log("childName:", childName);
     console.log("userId:", userId);
-    
-    if(!userId){
+
+    if (!userId) {
         return res.status(401).send("Not logged in");
     }
 
-    if(!childName){
+    if (!childName) {
         return res.status(400).send("Missing child id");
     }
 
-    const sql=`
+    const sql = `
     SELECT name, weight, height
     FROM childe
     WHERE  name = ?
     AND user_id = ?
     LIMIT 1`;
 
-    db.query(sql,[childName,userId],(err,result)=>{
+    db.query(sql, [childName, userId], (err, result) => {
 
-        if(err){
+        if (err) {
             console.log(err);
             return res.status(500).send("DB Error");
         }
 
-        if(result.length === 0 ){
+        if (result.length === 0) {
             return res.status(404).send("Child not found");
         }
 
@@ -1075,6 +1075,9 @@ exports.addMedicationType = (req, res) => {
             res.send("Medication added successfully");
         });
     });
+    console.log("REQ BODY:", req.body);
+    console.log("name:", name);
+    console.log("antibiotic:", antibiotic);
 };
 
 exports.deleteMedication = (req, res) => {
