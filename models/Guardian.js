@@ -11,7 +11,7 @@ class Guardian {
     constructor(userId, name, relationship, email) {
         this.#userId = userId;
         this.#name = formatName(name);
-        this.relationship = formatName(relationship);
+        this.#relationship = formatName(relationship);
         if (!validateEmail(email)) { throw new Error("Invalid email format"); }
         this.#email = email;
     }
@@ -22,11 +22,11 @@ class Guardian {
     getRelationship() { return this.#relationship; }
     getEmail() { return this.#email; }
     //SET
-    setName(newNome) {
+    setName(newName) {
         if (!newName) {
             throw new Error("Name is must required");
         }
-        this.#name = formatName(newNome);
+        this.#name = formatName(newName);
     }
     setRelationship(relationship) {
         if (!relationship) {

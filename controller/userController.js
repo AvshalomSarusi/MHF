@@ -5,8 +5,8 @@ const { validateEmail, validatePassword } = require('../utils/patterns');
 const formatName = require('../utils/formatName');
 const User = require('../models/User');
 const Guardian = require('../models/Guardian');
-// const Relative = require('../models/Child');
-// const Medication = require('../models/Medication');
+const Child = require('../models/Child');
+const Medication = require('../models/Medication');
 
 //USER
 exports.createProfile = (req, res) => {
@@ -378,11 +378,17 @@ exports.addChild = (req, res) => {
         return res.status(400).send("Name is required.");
     }
 
-    name = formatName(name);
+    let child;
+
+    try {
+        child = new Child(userId, name);
+    } catch (error) {
+        return res.status(400).send(error.message);
+    }
 
     const sql =
         `INSERT INTO childe (user_id, name)
-        VALUES ('${userId}','${name}')`;
+        VALUES ('${child.getUserId()}','${child.getName()}')`;
 
     db.query(sql, (err) => {
         if (err) {
@@ -1044,7 +1050,15 @@ exports.addMedicationType = (req, res) => {
         return res.send("Medication name required");
     }
 
-    let fixedName = formatName(name);
+    let medication;
+
+    try {
+        medication = new Medication(userId, name, antibiotic);
+    } catch (error) {
+        return res.send(error.message);
+    }
+
+    const fixedName = medication.getName();
     const checkSql = `
         SELECT * FROM medications
         WHERE name = '${fixedName}'
@@ -1063,7 +1077,7 @@ exports.addMedicationType = (req, res) => {
 
         const insertSql = `
             INSERT INTO medications (user_id, name, antibiotics)
-            VALUES ('${userId}','${fixedName}', '${antibiotic}')`;
+            VALUES ('${medication.getUserId()}','${medication.getName()}', '${medication.getAntibiotic()}')`;
 
         db.query(insertSql, (err2) => {
 
@@ -1075,9 +1089,7 @@ exports.addMedicationType = (req, res) => {
             res.send("Medication added successfully");
         });
     });
-    console.log("REQ BODY:", req.body);
-    console.log("name:", name);
-    console.log("antibiotic:", antibiotic);
+
 };
 
 exports.deleteMedication = (req, res) => {
