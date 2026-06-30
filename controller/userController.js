@@ -177,7 +177,7 @@ exports.login = (req, res) => {
 
             res.redirect('/home');
         } else {
-            res.send("Incorrect username or password.");
+            res.status(401).send("Incorrect username or password.");
         }
     });
 };
@@ -636,7 +636,7 @@ exports.addChildGuardian = (req, res) => {
                 return res.status(500).send("BD check error");
             }
             if (result.length > 0) {
-                return res.send("Guardian already linked to this relative");
+                return res.status(409).send("Guardian already linked to this relative");
             }
             const insertSql =
                 `INSERT INTO child_guardian (user_id, child_id, guardian_id)
@@ -644,7 +644,8 @@ exports.addChildGuardian = (req, res) => {
 
             db.query(insertSql, (err) => {
                 if (err) {
-                    console.log("DB insert error");
+                    console.log(err);
+                    return res.status(500).send("DB insert error");
                 }
                 res.send("Guardian linked successfuly");
 
@@ -1014,7 +1015,7 @@ exports.addMedication = (req, res) => {
 
         if (err) {
             console.log("INSERT LOG ERROR:", err);
-            return res.send("Insert error");
+            return res.status(500).send("Insert error");
         }
 
         res.send("Medication added");
@@ -1047,7 +1048,7 @@ exports.addMedicationType = (req, res) => {
     }
 
     if (!name) {
-        return res.send("Medication name required");
+        return res.status(400).send("Medication name required");
     }
 
     let medication;
@@ -1055,7 +1056,7 @@ exports.addMedicationType = (req, res) => {
     try {
         medication = new Medication(userId, name, antibiotic);
     } catch (error) {
-        return res.send(error.message);
+        return res.status(400).send(error.message);
     }
 
     const fixedName = medication.getName();
@@ -1068,11 +1069,11 @@ exports.addMedicationType = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.send("DB check error");
+            return res.status(500).send("DB check error");
         }
 
         if (results.length > 0) {
-            return res.send(`${name} already exists`);
+            return res.status(409).send(`${name} already exists`);
         }
 
         const insertSql = `
@@ -1083,7 +1084,7 @@ exports.addMedicationType = (req, res) => {
 
             if (err2) {
                 console.log(err2);
-                return res.send("DB insert error");
+                return res.status(500).send("DB insert error");
             }
 
             res.send("Medication added successfully");
