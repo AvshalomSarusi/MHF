@@ -1,68 +1,104 @@
+// Shared RTL HTML wrapper for all emails, so Hebrew renders correctly and
+// embedded left-to-right values (names, medications, numbers) don't get
+// reordered by the mail client's bidi algorithm. Each value that may be in
+// Latin/digits is isolated with <bdi>.
+function shell(inner) {
+    return `<div dir="rtl" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.8;color:#21302b;text-align:right;max-width:540px;margin:0 auto">${inner}</div>`;
+}
+
 const message = {
 
     welcome: (name) => ({
-        subject: "Welcome to MHF",
-        text: `Hello ${name},
-        
-        Welcome to MHF.
-        
-        Your account has been created successfully.
-        You can now log in and start using the system.
-        
-        We wish you a smooth and helpful experience.
-        
-        Thank you,
-        MHF Team`
-        
+        subject: "ברוכים הבאים ל-MHF",
+        text: `שלום ${name},
+
+ברוכים הבאים ל-MHF.
+חשבונך נוצר בהצלחה, וניתן כעת להתחבר ולהתחיל להשתמש במערכת.
+
+אנו מאחלים לך חוויה נעימה ומועילה.
+
+תודה,
+צוות MHF`,
+        html: shell(
+            `<p>שלום <bdi>${name}</bdi>,</p>` +
+            `<p>ברוכים הבאים ל-MHF.</p>` +
+            `<p>חשבונך נוצר בהצלחה, וניתן כעת להתחבר ולהתחיל להשתמש במערכת.</p>` +
+            `<p>אנו מאחלים לך חוויה נעימה ומועילה.</p>` +
+            `<p>תודה,<br>צוות MHF</p>`
+        ),
     }),
 
 
-    emailAlreadyExists: "A user with this email is already registered",
+    emailAlreadyExists: "משתמש עם אימייל זה כבר רשום",
 
 
     securityEmailAlreadyExists: (name) => ({
-        subject: "Security Notice – MHF",
-        text: `Hello ${name},
+        subject: "הודעת אבטחה – MHF",
+        text: `שלום ${name},
 
-        Someone recently attempted to create an account using this email address.
+לאחרונה בוצע ניסיון ליצור חשבון באמצעות כתובת אימייל זו.
+ייתכן שמדובר בטעות. אם זה לא היה אתה, אנו ממליצים לבדוק את אבטחת חשבונך ולעדכן את הסיסמה במידת הצורך.
 
-        This may simply be a mistake. If this was not you, we recommend reviewing your account security and updating your password if necessary.
+לשינוי הסיסמה: http://localhost:3002/changePass
 
-        MHF Security Team
-        
-        http://localhost:3002/changePass`
-        
+צוות האבטחה של MHF`,
+        html: shell(
+            `<p>שלום <bdi>${name}</bdi>,</p>` +
+            `<p>לאחרונה בוצע ניסיון ליצור חשבון באמצעות כתובת אימייל זו.</p>` +
+            `<p>ייתכן שמדובר בטעות. אם זה לא היה אתה, אנו ממליצים לבדוק את אבטחת חשבונך ולעדכן את הסיסמה במידת הצורך.</p>` +
+            `<p><a href="http://localhost:3002/changePass" style="color:#16715f">לחצו כאן לשינוי הסיסמה</a></p>` +
+            `<p>צוות האבטחה של MHF</p>`
+        ),
     }),
 
-    passChange : "Password update successfuly",
+    passChange: "הסיסמה עודכנה בהצלחה",
 
-    passwordChanged: (name)=>({
-        subject: "Your MHF Password Has Been Changed",
-        text: `Hello ${name},
+    passwordChanged: (name) => ({
+        subject: "הסיסמה שלך ב-MHF שונתה",
+        text: `שלום ${name},
 
-        Thank you for your cooperation.
-        
-        Your password has been successfully changed.
-        If you made this update, no further action is needed.
-        
-        If you did not change your password, we strongly recommend reviewing your account immediately.
-        
-        Thank you,
-        MHF Security Team`
+תודה על שיתוף הפעולה.
+הסיסמה שלך שונתה בהצלחה. אם ביצעת עדכון זה, אין צורך בפעולה נוספת.
+אם לא שינית את הסיסמה, אנו ממליצים בחום לבדוק את חשבונך באופן מיידי.
+
+תודה,
+צוות האבטחה של MHF`,
+        html: shell(
+            `<p>שלום <bdi>${name}</bdi>,</p>` +
+            `<p>תודה על שיתוף הפעולה.</p>` +
+            `<p>הסיסמה שלך שונתה בהצלחה. אם ביצעת עדכון זה, אין צורך בפעולה נוספת.</p>` +
+            `<p>אם לא שינית את הסיסמה, אנו ממליצים בחום לבדוק את חשבונך באופן מיידי.</p>` +
+            `<p>תודה,<br>צוות האבטחה של MHF</p>`
+        ),
     }),
 
-    medicationReminder: (name, childName, medicationName, dosage, time) => ({
-        subject: `MHF Reminder for ${childName}`,
-    
-        text: `Hello ${name},
-    
-    It is time to give ${childName} the medication.
-    
-    Medication: ${medicationName}
-    Dosage: ${dosage}
-    Time: ${time}
-    
-    MHF Reminder System`
+    medicationReminder: (name, childName, medicationName, dosage, time, confirmLink) => ({
+        subject: `תזכורת MHF עבור ${childName}`,
+
+        text: `שלום ${name},
+
+הגיע הזמן לתת ל-${childName} את התרופה.
+
+תרופה: ${medicationName}
+מינון: ${dosage}
+שעה: ${time}
+
+לאישור שהילד קיבל את התרופה, היכנסו לקישור:
+${confirmLink}
+
+מערכת התזכורות של MHF`,
+        // The confirmation button is part of this single block (not a second
+        // appended block) so the mail client doesn't fold it into "quoted text".
+        html: shell(
+            `<p>שלום <bdi>${name}</bdi>,</p>` +
+            `<p>הגיע הזמן לתת ל-<bdi>${childName}</bdi> את התרופה.</p>` +
+            `<p style="margin:6px 0"><strong>תרופה:</strong> <bdi>${medicationName}</bdi></p>` +
+            `<p style="margin:6px 0"><strong>מינון:</strong> <bdi>${dosage}</bdi></p>` +
+            `<p style="margin:6px 0"><strong>שעה:</strong> <bdi>${time}</bdi></p>` +
+            `<p style="margin-top:18px">לאישור שהילד קיבל את התרופה, לחצו על הכפתור:</p>` +
+            `<p style="margin:6px 0 4px"><a href="${confirmLink}" style="background:#16715f;color:#ffffff;padding:12px 26px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:bold">אישור נטילת התרופה</a></p>` +
+            `<p style="margin-top:18px;color:#8a9389;font-size:13px">מערכת התזכורות של MHF</p>`
+        ),
     }),
 };
 

@@ -10,7 +10,7 @@ function loadGuardiansForMessage(){
 
         const select = document.getElementById("guardianSelect");
 
-        select.innerHTML=`<option value="" disabled selected hidden>Select Guardian</option>`;
+        select.innerHTML=`<option value="" disabled selected hidden>בחר אפוטרופוס</option>`;
 
         data.forEach(guardian => {
             
@@ -34,7 +34,7 @@ function sendGuardianToMessage(){
     const message = document.getElementById("messageBody").value;
 
     if(!guardianId || !subject || !message){
-        alert("Please fill all fields");
+        alert("יש למלא את כל השדות");
         return;
     }
 

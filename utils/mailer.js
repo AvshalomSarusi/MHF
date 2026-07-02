@@ -10,14 +10,21 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const sendMail = async (to, subject, text) => {
+const sendMail = async (to, subject, text, html) => {
     try {
-        const info = await transporter.sendMail({
+        const mail = {
             from: process.env.MAILER_USER,
             to: to,
             subject: subject,
             text: text
-        });
+        };
+
+        // send an HTML body when provided so Hebrew (RTL) renders correctly
+        if (html) {
+            mail.html = html;
+        }
+
+        const info = await transporter.sendMail(mail);
 
         console.log("Mail sent:", info.response);
     } catch (err) {

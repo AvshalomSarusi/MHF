@@ -63,6 +63,7 @@ router.get('/getRole', authMiddleware, (req, res) => {
 
 router.get('/logout', (req, res) => {
     res.clearCookie('mhf_user');
+    res.clearCookie('mhf_role');
     res.redirect('/');
 });
 

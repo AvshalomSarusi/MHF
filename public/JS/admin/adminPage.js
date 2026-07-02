@@ -11,7 +11,7 @@ function runQuery() {
     const sqlQuery = sqlQueryInput.value.trim();
 
     if (!sqlQuery) {
-        queryResult.textContent = 'Please write SQL query first.';
+        queryResult.textContent = 'יש לכתוב קודם שאילתת SQL.';
         return;
     }
 

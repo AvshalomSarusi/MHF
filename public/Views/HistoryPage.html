@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl" lang="he">
 
 <head>
     <meta name="mobile-web-app-capable" content="yes">
@@ -7,38 +7,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>MHF Medication History</title>
+    <title>MHF היסטוריית תרופות</title>
     <link rel="stylesheet" href="/CSS/theme.css">
     <link rel="stylesheet" href="/CSS/profile.css">
 </head>
 
 <body>
+    <script>try{if(document.cookie.split('; ').indexOf('mhf_role=admin')>-1){document.body.classList.add('admin')}}catch(e){}</script>
     <a class="brand app-brand" href="/p">My Healthy Family</a>
     <div class = "menu">
-        <button id="menueBtn">Menu</button>
+        <button id="menueBtn">תפריט</button>
 
         <div id="menuItem" class="menu-items">
-            <button onclick="location.href='/p'">Profile</button>
-            <button onclick="location.href='/ccp'">Relative card</button>
-            <button onclick="location.href='/e'">Edit</button>
-            <button onclick="location.href='/gm'">Guardian message</button>
-            <button onclick="location.href='/changePass'">Change password</button>
-            <button onclick="location.href='/logout'">Logout</button>
+            <button onclick="location.href='/p'">פרופיל</button>
+            <button onclick="location.href='/ccp'">כרטיס בן משפחה</button>
+            <button onclick="location.href='/e'">עריכה</button>
+            <button onclick="location.href='/gm'">הודעה לאפוטרופוס</button>
+            <button onclick="location.href='/changePass'">שינוי סיסמה</button>
+            <button onclick="location.href='/logout'">התנתקות</button>
         </div>
     </div>
 
-    <h2>Medication History</h2>
+    <h2>היסטוריית תרופות</h2>
 
-    <p>Last 30 medication confirmations</p>
+    <p>30 אישורי התרופות האחרונים</p>
 
     <table border="1">
         <tr>
-            <th>Relative</th>
-            <th>Medication</th>
-            <th>Amount</th>
-            <th>Given by</th>
-            <th>Date</th>
-            <th>Time</th>
+            <th>בן משפחה</th>
+            <th>תרופה</th>
+            <th>כמות</th>
+            <th>ניתן ע&quot;י</th>
+            <th>תאריך</th>
+            <th>שעה</th>
         </tr>
 
         <tbody id="historyTableBody"></tbody>

@@ -330,7 +330,7 @@ td button:hover {
 .menu-items button {
     display: block;
     width: 100%;
-    text-align: left;
+    text-align: right;
     margin: 2px 0;
     padding: 10px 14px;
     font-weight: 500;
@@ -350,25 +350,38 @@ td button:hover {
 }
 
 /* ---------------------------------------------------------------------
-   Admin top bar (admin sees the full nav as a fixed bar)
+   Admin top bar (admin sees the full nav as a sticky bar)
 --------------------------------------------------------------------- */
-body.admin { padding-top: 78px; }
+/* Lay the admin page out as a column so the nav bar can be pulled to the
+   very top with order:-1 — regardless of where the menu sits in the HTML
+   (some pages put the page title before the menu). */
+body.admin {
+    display: flex;
+    flex-direction: column;
+}
 
+/* The bar is STICKY, not fixed: it keeps its real height in the page
+   flow, so it never covers the cards/labels beneath it — no matter how
+   many rows the buttons wrap into on a narrow phone — and it still
+   stays pinned to the top while scrolling.
+   On in-app user pages the bar is the .menu wrapper; on the admin page
+   #menuItem is a direct child of <body>, so it becomes the bar itself. */
 body.admin .menu,
-body.admin #menuItem.menu-items {
-    position: fixed;
+body.admin > #menuItem.menu-items {
+    order: -1;
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
+    left: auto;
+    right: auto;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 10px;
-    margin: 0;
-    padding: 12px 18px;
-    background: rgba(255, 253, 248, 0.92);
+    gap: 8px;
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    background: rgba(255, 253, 248, 0.94);
     backdrop-filter: blur(8px);
     border: none;
     border-bottom: 1px solid var(--line);
@@ -378,15 +391,44 @@ body.admin #menuItem.menu-items {
     z-index: 1000;
 }
 
+/* On user pages the inner list is plain flex content inside the .menu bar
+   (it must NOT position itself again, or it double-stacks over the bar). */
+body.admin .menu #menuItem.menu-items {
+    position: static;
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none;
+}
+
+/* compact buttons so more fit per row → fewer wrapped rows on mobile */
 body.admin .menu-items button {
     width: auto;
-    min-width: 118px;
+    min-width: 0;
+    flex: 0 0 auto;
     text-align: center;
     margin: 0;
-    padding: 9px 16px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
 }
 
 body.admin #menueBtn { display: none; }
+
+/* the sticky bar already reserves its space, so page titles don't need the
+   large top margin that clears the menu on non-admin pages.
+   (extra :not(.auth) keeps specificity above the title-treatment rule below) */
+body.admin:not(.auth) > h1,
+body.admin:not(.auth) > h2 { margin-top: 14px; }
 
 /* ---------------------------------------------------------------------
    Page title treatment (in-app pages)

@@ -85,6 +85,8 @@
     font-size: 0.95rem;
     line-height: 1.55;
     background: var(--surface-2);
+    direction: ltr;      /* SQL is written left-to-right */
+    text-align: left;
 }
 
 #runQueryBtn {

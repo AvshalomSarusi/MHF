@@ -3,26 +3,26 @@ const db = require('../dbConfig');
 exports.runQuery = (req, res) => {
 
     if (req.role !== 'admin') {
-        return res.status(403).send("Access denied");
+        return res.status(403).send("הגישה נדחתה");
     }
 
     const { sqlQuery } = req.body;
 
     if (!sqlQuery) {
-        return res.status(400).send("Missing SQL query");
+        return res.status(400).send("חסרה שאילתת SQL");
     }
 
     const cleanQuery = sqlQuery.trim();
 
     if (!/^select\s+/i.test(cleanQuery)) {
-        return res.status(403).send("Only SELECT queries are allowed");
+        return res.status(403).send("מותרות שאילתות SELECT בלבד");
     }
 
     db.query(cleanQuery, (err, result) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("SQL query failed");
+            return res.status(500).send("הרצת שאילתת ה-SQL נכשלה");
         }
         
         const safeResult = result.map(row => {
@@ -48,7 +48,7 @@ exports.getDashboardStats  = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("Failed to load dashboard stats");
+            return res.status(500).send("טעינת נתוני לוח הבקרה נכשלה");
         }
 
         res.json({

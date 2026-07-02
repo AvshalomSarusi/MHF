@@ -1,7 +1,7 @@
 function validateEmail(email) {
 
     if (!email) {
-        throw new Error("Email is must required")
+        throw new Error("יש להזין אימייל")
     }
 
     email = email.trim();
@@ -14,7 +14,7 @@ function validateEmail(email) {
 function validatePassword(password) {
 
     if (!password || password.length < 8) {
-        throw new Error("Password nust be at least 8 characters");
+        throw new Error("הסיסמה חייבת להכיל לפחות 8 תווים");
     }
 
     password = password.trim();

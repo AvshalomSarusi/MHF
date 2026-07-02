@@ -8,6 +8,44 @@ const Guardian = require('../models/Guardian');
 const Child = require('../models/Child');
 const Medication = require('../models/Medication');
 
+// Styled RTL result page for the medication-confirmation link (opened in a browser
+// from the reminder email). ok=true -> green success look, ok=false -> red error look.
+function confirmPage(res, status, ok, title, subtitle) {
+    res.status(status).send(`<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MHF</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+       font-family:Arial,Helvetica,sans-serif;color:#21302b;padding:24px;background:#f4f1ea;
+       background-image:radial-gradient(1100px 520px at 12% -8%,#e2efe9 0%,transparent 60%),
+                        radial-gradient(900px 480px at 108% 4%,#f6e5da 0%,transparent 55%);}
+  .card{background:#fffdf8;border:1px solid #e4dfd2;border-radius:22px;
+        box-shadow:0 18px 44px rgba(20,50,42,.16);max-width:440px;width:100%;
+        padding:40px 30px;text-align:center}
+  .badge{width:72px;height:72px;border-radius:50%;margin:0 auto 20px;display:flex;
+         align-items:center;justify-content:center;font-size:40px;font-weight:bold;line-height:1}
+  .ok{background:#e2efe9;color:#16715f}
+  .err{background:#f6e0de;color:#b23b3b}
+  h1{font-size:1.45rem;margin:0 0 12px;font-weight:700}
+  p{color:#5d6b63;margin:0;line-height:1.7;font-size:1rem}
+  .brand{margin-top:26px;color:#8a9389;font-size:.85rem}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge ${ok ? 'ok' : 'err'}">${ok ? '✓' : '!'}</div>
+    <h1>${title}</h1>
+    <p>${subtitle}</p>
+    <div class="brand">My Healthy Family</div>
+  </div>
+</body>
+</html>`);
+}
+
 //USER
 exports.createProfile = (req, res) => {
 
@@ -17,7 +55,7 @@ exports.createProfile = (req, res) => {
     const { name, last, email, pass } = req.body;
 
     if (!name || !last || !email || !pass) {
-        return res.status(400).send("Missing required fields");
+        return res.status(400).send("חסרים שדות חובה");
     }
 
     try {
@@ -32,7 +70,7 @@ exports.createProfile = (req, res) => {
     db.query(checkSql, (checkErr, checkResult) => {
         if (checkErr) {
             console.log(checkErr);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         // אם נמצא משתמש עם אותו אימייל
@@ -45,7 +83,8 @@ exports.createProfile = (req, res) => {
             sendMail(
                 email,
                 msg.subject,
-                msg.text
+                msg.text,
+                msg.html
             );
 
             return res.status(400).send(messages.emailAlreadyExists);
@@ -59,7 +98,7 @@ exports.createProfile = (req, res) => {
         db.query(sql, (err, result) => {
             if (err) {
                 console.log(err);
-                return res.status(500).send("DB error");
+                return res.status(500).send("שגיאת מסד נתונים");
             }
 
             msg = messages.welcome(name);
@@ -67,10 +106,11 @@ exports.createProfile = (req, res) => {
             sendMail(
                 email,
                 msg.subject,
-                msg.text
+                msg.text,
+                msg.html
             );
 
-            res.send("User created");
+            res.send("המשתמש נוצר");
         });
     });
 };
@@ -84,23 +124,23 @@ exports.changePass = (req, res) => {
     const { name, lname, email, pass1, pass2 } = req.body;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!name || !lname || !email || !pass1 || !pass2) {
-        return res.status(400).send("Missing required fields");
+        return res.status(400).send("חסרים שדות חובה");
     }
 
     if (pass1 === pass2) {
-        return res.status(400).send("New password must be different from old password");
+        return res.status(400).send("הסיסמה החדשה חייבת להיות שונה מהישנה");
     }
 
     if (!validateEmail(email)) {
-        return res.status(400).send("Invalid email format");
+        return res.status(400).send("פורמט אימייל לא תקין");
     }
 
     if (!validatePassword(pass2)) {
-        return res.status(400).send("Invalid new password format");
+        return res.status(400).send("פורמט הסיסמה החדשה לא תקין");
     }
 
     const checkDetails = `SELECT * FROM users WHERE id ='${userId}'`;
@@ -108,17 +148,17 @@ exports.changePass = (req, res) => {
     db.query(checkDetails, (err, result) => {
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         if (result.length === 0) {
-            return res.status(404).send("User not found");
+            return res.status(404).send("המשתמש לא נמצא");
         }
 
         const user = result[0];
 
         if (name !== user.firstname || lname !== user.lastname || pass1 !== user.password) {
-            return res.status(400).send("One or more of your details are incorrect");
+            return res.status(400).send("אחד או יותר מהפרטים שלך שגויים");
         }
 
         const updateSql = `UPDATE users SET password='${pass2}' WHERE email='${email}'`;
@@ -126,7 +166,7 @@ exports.changePass = (req, res) => {
         db.query(updateSql, [email], (err, result) => {
             if (err) {
                 console.log(err);
-                return res.status(500).send("Password update failed");
+                return res.status(500).send("עדכון הסיסמה נכשל");
             }
 
             msg = messages.passwordChanged(name);
@@ -134,7 +174,8 @@ exports.changePass = (req, res) => {
             sendMail(
                 email,
                 msg.subject,
-                msg.text
+                msg.text,
+                msg.html
             );
 
             res.send(messages.passChange);
@@ -147,13 +188,13 @@ exports.login = (req, res) => {
     const { nickname, pass } = req.body;
 
     if (!nickname || !pass) {
-        return res.status(400).send("Missing login datails");
+        return res.status(400).send("חסרים פרטי התחברות");
     }
     if (!formatName(nickname)) {
-        return res.status(400).send("Invalid nickname format");
+        return res.status(400).send("פורמט שם משתמש לא תקין");
     }
     if (!validatePassword(pass)) {
-        return res.status(400).send("Invalid password format");
+        return res.status(400).send("פורמט סיסמה לא תקין");
     }
 
     const sql =
@@ -164,7 +205,7 @@ exports.login = (req, res) => {
     db.query(sql, (err, result) => {
         if (err) {
             console.error(err);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         if (result.length > 0) {
@@ -175,9 +216,17 @@ exports.login = (req, res) => {
                 sameSite: 'strict'
             });
 
+            // readable (non-httpOnly) role cookie so a page can apply the admin
+            // layout BEFORE first paint — prevents the layout "jump" on navigation.
+            // real access is still enforced server-side via mhf_user + role checks.
+            res.cookie('mhf_role', result[0].role, {
+                maxAge: 1000 * 60 * 60 * 24 * 7,
+                sameSite: 'strict'
+            });
+
             res.redirect('/home');
         } else {
-            res.status(401).send("Incorrect username or password.");
+            res.status(401).send("שם משתמש או סיסמה שגויים.");
         }
     });
 };
@@ -188,17 +237,17 @@ exports.updateLog = (req, res) => {
     const logId = req.params.id;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     const { dosage, scheduled_time } = req.body;
 
     if (!dosage || !scheduled_time) {
-        return res.status(400).send("Missing required fields");
+        return res.status(400).send("חסרים שדות חובה");
     }
 
     if (!/^\d{2}:\d{2}$/.test(scheduled_time) && !/^\d{2}:\d{2}:\d{2}$/.test(scheduled_time)) {
-        return res.status(400).send("Invalid time format");
+        return res.status(400).send("פורמט שעה לא תקין");
     }
 
     const sql = `
@@ -213,14 +262,14 @@ exports.updateLog = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("Update failed");
+            return res.status(500).send("העדכון נכשל");
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).send("Record not found");
+            return res.status(404).send("הרשומה לא נמצאה");
         }
 
-        res.send("Updated successfully");
+        res.send("עודכן בהצלחה");
 
     });
 };
@@ -230,7 +279,7 @@ exports.getUser = (req, res) => {
     const userId = req.userId;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     const sql =
@@ -242,11 +291,11 @@ exports.getUser = (req, res) => {
 
         if (err) {
             console.error(err);
-            return res.status(500).send("DB error.");
+            return res.status(500).send("שגיאת מסד נתונים.");
         }
 
         if (result.length === 0) {
-            return res.status(404).send("User not found");
+            return res.status(404).send("המשתמש לא נמצא");
         }
 
         res.json(result[0]);
@@ -259,7 +308,7 @@ exports.deleteLog = (req, res) => {
     const logId = req.params.id;
 
     if (!userId) {
-        return res.status(401).send("Not logged in.");
+        return res.status(401).send("לא מחוברים.");
     }
 
     const getChildSql = `
@@ -273,11 +322,11 @@ exports.deleteLog = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         if (result.length === 0) {
-            return res.status(404).send("Task not found");
+            return res.status(404).send("המשימה לא נמצאה");
         }
 
         const childId = result[0].child_id;
@@ -292,7 +341,7 @@ exports.deleteLog = (req, res) => {
 
             if (err2) {
                 console.log(err2);
-                return res.status(500).send("Delete task failed");
+                return res.status(500).send("מחיקת המשימה נכשלה");
             }
 
             const deleteGuardianLinkSql = `
@@ -305,10 +354,10 @@ exports.deleteLog = (req, res) => {
 
                 if (err3) {
                     console.log(err3);
-                    return res.status(500).send("Delete guardian link failed");
+                    return res.status(500).send("מחיקת קישור האפוטרופוס נכשלה");
                 }
 
-                res.send("Task deleted successfully");
+                res.send("המשימה נמחקה בהצלחה");
             });
         });
     });
@@ -324,11 +373,11 @@ exports.sendGuardianMessage = (req, res) => {
     console.log(guardianId);
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!guardianId || !subject || !message) {
-        return res.status(400).send("Missing message datails");
+        return res.status(400).send("חסרים פרטי הודעה");
     }
 
     const sql = `
@@ -341,27 +390,40 @@ exports.sendGuardianMessage = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         if (result.length === 0) {
-            return res.status(404).send("Guardian not found");
+            return res.status(404).send("האפוטרופוס לא נמצא");
         }
 
         const guardian = result[0];
-        const fullMessage = `
-        ${message}
-        
-        --------------------------------------------
-        This email was sent through the MHF website.`;
+        const fullMessage = `${message}
+
+--------------------------------------------
+הודעה זו נשלחה דרך אתר MHF.`;
+
+        const safeMessage = message
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\n/g, "<br>");
+
+        const htmlMessage =
+            `<div dir="rtl" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.8;color:#21302b;text-align:right;max-width:540px;margin:0 auto">` +
+            `${safeMessage}` +
+            `<hr style="border:none;border-top:1px solid #e0e0e0;margin:16px 0">` +
+            `<span style="color:#777;font-size:13px">הודעה זו נשלחה דרך אתר MHF.</span>` +
+            `</div>`;
 
         sendMail(
             guardian.email,
             subject,
-            fullMessage
+            fullMessage,
+            htmlMessage
         );
 
-        res.send("Message sent successfuly");
+        res.send("ההודעה נשלחה בהצלחה");
     });
 }
 //CHILD
@@ -371,11 +433,11 @@ exports.addChild = (req, res) => {
     let { name } = req.body;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!name) {
-        return res.status(400).send("Name is required.");
+        return res.status(400).send("יש להזין שם.");
     }
 
     let child;
@@ -393,10 +455,10 @@ exports.addChild = (req, res) => {
     db.query(sql, (err) => {
         if (err) {
             console.error(err);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
-        res.send("Relative added successfuly.");
+        res.send("בן המשפחה נוסף בהצלחה.");
     });
 };
 
@@ -405,7 +467,7 @@ exports.getChildren = (req, res) => {
     const userId = req.userId;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     const sql =
@@ -414,7 +476,7 @@ exports.getChildren = (req, res) => {
     db.query(sql, (err, result) => {
         if (err) {
             console.error(err);
-            return res.status(500).send("DB error.");
+            return res.status(500).send("שגיאת מסד נתונים.");
         }
 
         res.json(result);
@@ -427,11 +489,11 @@ exports.deleteRelative = (req, res) => {
     const relativeId = req.params.id;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!relativeId) {
-        return res.status(400).send("Missing relative");
+        return res.status(400).send("חסר בן משפחה");
     }
 
     const checkTasksSql = `
@@ -445,11 +507,11 @@ exports.deleteRelative = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         if (taskResult.length > 0) {
-            return res.status(409).send("Cannot delete relative. please delete task first");
+            return res.status(409).send("לא ניתן למחוק בן משפחה. יש למחוק קודם את המשימה");
         }
 
         const deleteRelativeSql = `
@@ -461,14 +523,14 @@ exports.deleteRelative = (req, res) => {
 
             if (err) {
                 console.log(err);
-                return res.status(500).send("Delete relative failed");
+                return res.status(500).send("מחיקת בן המשפחה נכשלה");
             }
 
             if (result.affectedRows === 0) {
-                return res.status(404).send("Relative not found");
+                return res.status(404).send("בן המשפחה לא נמצא");
             }
 
-            res.send("Relative deleted successfully");
+            res.send("בן המשפחה נמחק בהצלחה");
         });
     });
 };
@@ -480,22 +542,22 @@ exports.updateChildData = (req, res) => {
     const { weight, height } = req.body;
 
     if (!userId) {
-        return res.status(401).send("Not logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!childId) {
-        return res.status(400).send("Missing child id");
+        return res.status(400).send("חסר מזהה בן משפחה");
     }
 
     if (!weight || !height) {
-        return res.status(400).send("Missing weight or height");
+        return res.status(400).send("חסר משקל או גובה");
     }
 
     const weightNumber = Number(weight);
     const heightNumber = Number(height);
 
     if (isNaN(weightNumber) || isNaN(heightNumber)) {
-        return res.status(400).send("Weight and height must be numbers");
+        return res.status(400).send("משקל וגובה חייבים להיות מספרים");
     }
 
     const sql = `
@@ -510,14 +572,14 @@ exports.updateChildData = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("Update child data failed");
+            return res.status(500).send("עדכון נתוני בן המשפחה נכשל");
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).send("Child not found");
+            return res.status(404).send("בן המשפחה לא נמצא");
         }
 
-        res.send("Child data updated successfully");
+        res.send("נתוני בן המשפחה עודכנו בהצלחה");
     });
 };
 
@@ -528,11 +590,11 @@ exports.addGuardian = (req, res) => {
     const { name, relationship, email } = req.body;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!name || !relationship || !email) {
-        return res.status(400).send("Missing required fields");
+        return res.status(400).send("חסרים שדות חובה");
     }
 
     let guardian;
@@ -552,11 +614,11 @@ exports.addGuardian = (req, res) => {
 
         if (err) {
             console.error(err);
-            return res.status(500).send("DB error.");
+            return res.status(500).send("שגיאת מסד נתונים.");
         }
 
         if (result.length > 0) {
-            return res.status(409).send("Guardian already exists.");
+            return res.status(409).send("האפוטרופוס כבר קיים.");
         }
 
         const insertSql =
@@ -566,10 +628,10 @@ exports.addGuardian = (req, res) => {
         db.query(insertSql, (err2) => {
             if (err2) {
                 console.error(err2);
-                return res.status(500).send("DB error.");
+                return res.status(500).send("שגיאת מסד נתונים.");
             }
 
-            res.send("Guardian added successfully");
+            res.send("האפוטרופוס נוסף בהצלחה");
         });
     });
 };
@@ -579,7 +641,7 @@ exports.getGuardian = (req, res) => {
     const userId = req.userId;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     const sql = `SELECT id, name From guardian WHERE user_id = '${userId}'`;
@@ -587,7 +649,7 @@ exports.getGuardian = (req, res) => {
     db.query(sql, (err, result) => {
         if (err) {
             console.log(err);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
         res.json(result);
     });
@@ -599,12 +661,12 @@ exports.addChildGuardian = (req, res) => {
     const { child_id, guardian_id } = req.body;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!child_id || !guardian_id) {
 
-        return res.status(400).send("Missing data");
+        return res.status(400).send("חסרים נתונים");
     }
 
     const checkTaskSql = `
@@ -617,37 +679,37 @@ exports.addChildGuardian = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
         if (taskResult.length === 0) {
-            return res.status(404).send("Child not found in task table");
+            return res.status(404).send("בן המשפחה לא נמצא בטבלת המשימות");
         }
 
         const checkSql =
             `SELECT *
-        FROM child_guardian
-        WHERE child_id = '${child_id}'
-        AND guardian_id = '${guardian_id}'
-        AND user_id = '${userId}'`;
+            FROM child_guardian
+            WHERE child_id = '${child_id}'
+            AND guardian_id = '${guardian_id}'
+            AND user_id = '${userId}'`;
 
         db.query(checkSql, (err, result) => {
             if (err) {
                 console.log(err);
-                return res.status(500).send("BD check error");
+                return res.status(500).send("שגיאת בדיקת מסד נתונים");
             }
             if (result.length > 0) {
-                return res.status(409).send("Guardian already linked to this relative");
+                return res.status(409).send("האפוטרופוס כבר משויך לבן משפחה זה");
             }
             const insertSql =
                 `INSERT INTO child_guardian (user_id, child_id, guardian_id)
-        VALUES ('${userId}','${child_id}','${guardian_id}')`;
+                 VALUES ('${userId}','${child_id}','${guardian_id}')`;
 
             db.query(insertSql, (err) => {
                 if (err) {
                     console.log(err);
-                    return res.status(500).send("DB insert error");
+                    return res.status(500).send("שגיאת הוספה למסד נתונים");
                 }
-                res.send("Guardian linked successfuly");
+                res.send("האפוטרופוס שויך בהצלחה");
 
             });
         });
@@ -660,11 +722,11 @@ exports.deleteGuardian = (req, res) => {
     const guardianId = req.params.id;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!guardianId) {
-        return res.status(400).send("Missing guardian");
+        return res.status(400).send("חסר אפוטרופוס");
     }
 
     const checkTasksSql = `
@@ -676,10 +738,10 @@ exports.deleteGuardian = (req, res) => {
     db.query(checkTasksSql, [guardianId, userId], (err, taskResult) => {
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
         if (taskResult.length > 0) {
-            return res.status(409).send("Cannot delete guardian. please delete task first");
+            return res.status(409).send("לא ניתן למחוק אפוטרופוס. יש למחוק קודם את המשימה");
         }
 
         const deleteGuardianSql = `
@@ -691,14 +753,14 @@ exports.deleteGuardian = (req, res) => {
 
             if (err) {
                 console.log(err);
-                return res.status(500).send("Delete guardian failed");
+                return res.status(500).send("מחיקת האפוטרופוס נכשלה");
             }
 
             if (result.affectedRows === 0) {
-                return res.status(404).send("Guardian not found");
+                return res.status(404).send("האפוטרופוס לא נמצא");
             }
 
-            res.send("Guardian deleted successfully");
+            res.send("האפוטרופוס נמחק בהצלחה");
         });
     });
 };
@@ -709,7 +771,7 @@ exports.getLogs = (req, res) => {
     const userId = req.cookies.mhf_user;
 
     if (!userId) {
-        return res.status(401).send("Not logged in.");
+        return res.status(401).send("לא מחוברים.");
     }
 
     const sql =
@@ -734,7 +796,7 @@ exports.getLogs = (req, res) => {
     db.query(sql, (err, results) => {
         if (err) {
             console.log(err);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         res.json(results);
@@ -747,7 +809,7 @@ exports.confirmMedication = (req, res) => {
     const token = req.query.token;
 
     if (!token) {
-        return res.status(400).send("Missing confirmation token");
+        return confirmPage(res, 400, false, "קישור לא תקין", "חסר טוקן אישור בקישור.");
     }
 
     const checkTokenSql = `
@@ -759,28 +821,28 @@ exports.confirmMedication = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return confirmPage(res, 500, false, "אירעה שגיאה", "שגיאת מסד נתונים. נסו שוב מאוחר יותר.");
         }
 
         if (result.length === 0) {
-            return res.status(404).send("Invalid confirmation link");
+            return confirmPage(res, 404, false, "קישור לא תקין", "קישור האישור אינו תקין.");
         }
 
         const tokenData = result[0];
 
         if (!tokenData.task_id) {
-            return res.status(400).send("Missing task id");
+            return confirmPage(res, 400, false, "קישור לא תקין", "חסר מזהה משימה בקישור.");
         }
 
         if (tokenData.used === 1) {
-            return res.status(400).send("Medication already confirmed");
+            return confirmPage(res, 200, true, "התרופה כבר אושרה", "האישור עבור תרופה זו כבר נקלט במערכת.");
         }
 
         const now = new Date();
         const expiresAt = new Date(tokenData.expires_at);
 
         if (now > expiresAt) {
-            return res.status(400).send("This confirmation link has expired");
+            return confirmPage(res, 400, false, "הקישור פג תוקף", "תוקף קישור האישור פג, ולא ניתן לאשר דרכו.");
         }
 
         const checkTaskConfirmedSql = `
@@ -794,11 +856,11 @@ exports.confirmMedication = (req, res) => {
 
             if (err) {
                 console.log(err);
-                return res.status(500).send("DB Error");
+                return confirmPage(res, 500, false, "אירעה שגיאה", "שגיאת מסד נתונים. נסו שוב מאוחר יותר.");
             }
 
             if (confirmedResult.length > 0) {
-                return res.status(400).send("Medication already confirmed");
+                return confirmPage(res, 200, true, "התרופה כבר אושרה", "האישור עבור תרופה זו כבר נקלט במערכת.");
             }
 
             const getDosageSql = `
@@ -812,11 +874,11 @@ exports.confirmMedication = (req, res) => {
 
                 if (err) {
                     console.log(err);
-                    return res.status(500).send("Failed to get medication dosage");
+                    return confirmPage(res, 500, false, "אירעה שגיאה", "נכשלה שליפת מינון התרופה.");
                 }
 
                 if (dosageResult.length === 0) {
-                    return res.status(404).send("Medication task not found");
+                    return confirmPage(res, 404, false, "אירעה שגיאה", "משימת התרופה לא נמצאה.");
                 }
 
                 const childeNameSql = `
@@ -827,10 +889,10 @@ exports.confirmMedication = (req, res) => {
                 db.query(childeNameSql, (err, childResult) => {
                     if (err) {
                         console.log(err);
-                        return res.status(500).send("DB Error");
+                        return confirmPage(res, 500, false, "אירעה שגיאה", "שגיאת מסד נתונים. נסו שוב מאוחר יותר.");
                     }
                     if (childResult.length === 0) {
-                        return res.status(404).send("Child not found");
+                        return confirmPage(res, 404, false, "אירעה שגיאה", "בן המשפחה לא נמצא.");
                     }
 
 
@@ -842,10 +904,10 @@ exports.confirmMedication = (req, res) => {
                     db.query(guardianNameSql, (err, guardianResult) => {
                         if (err) {
                             console.log(err);
-                            return res.status(500).send("DB Error");
+                            return confirmPage(res, 500, false, "אירעה שגיאה", "שגיאת מסד נתונים. נסו שוב מאוחר יותר.");
                         }
                         if (guardianResult.length === 0) {
-                            return res.status(404).send("Guanrdian not found");
+                            return confirmPage(res, 404, false, "אירעה שגיאה", "האפוטרופוס לא נמצא.");
                         }
 
 
@@ -858,10 +920,10 @@ exports.confirmMedication = (req, res) => {
                         db.query(medicationNameSql, (err, medicationResult) => {
                             if (err) {
                                 console.log(err);
-                                return res.status(500).send("DB Error");
+                                return confirmPage(res, 500, false, "אירעה שגיאה", "שגיאת מסד נתונים. נסו שוב מאוחר יותר.");
                             }
                             if (medicationResult.length === 0) {
-                                return res.status(404).send("Medication not found");
+                                return confirmPage(res, 404, false, "אירעה שגיאה", "התרופה לא נמצאה.");
                             }
 
                             const childName = childResult[0].name;
@@ -880,7 +942,7 @@ exports.confirmMedication = (req, res) => {
 
                                 if (err) {
                                     console.log(err);
-                                    return res.status(500).send("Failed to save medication confirmation");
+                                    return confirmPage(res, 500, false, "אירעה שגיאה", "שמירת אישור התרופה נכשלה.");
                                 }
 
                                 const updateTokenSql = `
@@ -892,13 +954,10 @@ exports.confirmMedication = (req, res) => {
 
                                     if (err) {
                                         console.log(err);
-                                        return res.status(500).send("Confirmation saved, but token update failed");
+                                        return confirmPage(res, 500, false, "אירעה שגיאה", "האישור נשמר, אך אירעה שגיאה בעדכון.");
                                     }
 
-                                    res.send(`
-                                        <h2>Medication confirmed successfully</h2>
-                                        <p>Thank you. The confirmation was saved in the MHF system.</p>
-                                    `);
+                                    return confirmPage(res, 200, true, "אישור התרופה בוצע בהצלחה", "תודה! האישור נשמר במערכת.");
                                 });
                             });
                         });
@@ -914,7 +973,7 @@ exports.getMedicationHistory = (req, res) => {
     const userId = req.userId;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     const sql = `
@@ -940,7 +999,7 @@ exports.getMedicationHistory = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         res.json(result);
@@ -958,11 +1017,11 @@ exports.getChildCard = (req, res) => {
     console.log("userId:", userId);
 
     if (!userId) {
-        return res.status(401).send("Not logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!childName) {
-        return res.status(400).send("Missing child id");
+        return res.status(400).send("חסר מזהה בן משפחה");
     }
 
     const sql = `
@@ -976,11 +1035,11 @@ exports.getChildCard = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         if (result.length === 0) {
-            return res.status(404).send("Child not found");
+            return res.status(404).send("בן המשפחה לא נמצא");
         }
 
         res.json(result[0]);
@@ -994,13 +1053,13 @@ exports.addMedication = (req, res) => {
     const { child_id, medication, dosage, timeToSend } = req.body;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
     if (dosage.length <= 0) {
-        return res.status(400).send("Dosage must be greater than 0");
+        return res.status(400).send("המינון חייב להיות גדול מ-0");
     }
     if (!child_id || !medication || !dosage || !timeToSend) {
-        return res.status(400).send("All fields are required");
+        return res.status(400).send("יש למלא את כל השדות");
     }
 
     const medication_id = medication;
@@ -1015,10 +1074,10 @@ exports.addMedication = (req, res) => {
 
         if (err) {
             console.log("INSERT LOG ERROR:", err);
-            return res.status(500).send("Insert error");
+            return res.status(500).send("שגיאת הוספה");
         }
 
-        res.send("Medication added");
+        res.send("התרופה נוספה");
     });
 };
 
@@ -1027,13 +1086,13 @@ exports.getMedications = (req, res) => {
     const userId = req.userId;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     const sql = `SELECT id, name FROM medications WHERE user_id = '${userId}'`;
 
     db.query(sql, (err, results) => {
-        if (err) return res.status(500).send("DB error");
+        if (err) return res.status(500).send("שגיאת מסד נתונים");
         res.json(results);
     });
 };
@@ -1044,11 +1103,11 @@ exports.addMedicationType = (req, res) => {
     const { name, antibiotic } = req.body;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!name) {
-        return res.status(400).send("Medication name required");
+        return res.status(400).send("יש להזין שם תרופה");
     }
 
     let medication;
@@ -1069,11 +1128,11 @@ exports.addMedicationType = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB check error");
+            return res.status(500).send("שגיאת בדיקת מסד נתונים");
         }
 
         if (results.length > 0) {
-            return res.status(409).send(`${name} already exists`);
+            return res.status(409).send(`${name} כבר קיימת`);
         }
 
         const insertSql = `
@@ -1084,10 +1143,10 @@ exports.addMedicationType = (req, res) => {
 
             if (err2) {
                 console.log(err2);
-                return res.status(500).send("DB insert error");
+                return res.status(500).send("שגיאת הוספה למסד נתונים");
             }
 
-            res.send("Medication added successfully");
+            res.send("התרופה נוספה בהצלחה");
         });
     });
 
@@ -1099,11 +1158,11 @@ exports.deleteMedication = (req, res) => {
     const medicationId = req.params.id;
 
     if (!userId) {
-        return res.status(401).send("No logged in");
+        return res.status(401).send("לא מחוברים");
     }
 
     if (!medicationId) {
-        return res.status(400).send("Missing medication");
+        return res.status(400).send("חסרה תרופה");
     }
 
     const checkTaskSql = `
@@ -1117,10 +1176,10 @@ exports.deleteMedication = (req, res) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
         if (taskResult.length > 0) {
-            return res.status(409).send("Cannot delete medication. please delete task first")
+            return res.status(409).send("לא ניתן למחוק תרופה. יש למחוק קודם את המשימה")
         }
 
         const deleteMedicationSql = `
@@ -1132,14 +1191,14 @@ exports.deleteMedication = (req, res) => {
 
             if (err) {
                 console.log(err);
-                return res.status(500).send("Delete medication medication failed");
+                return res.status(500).send("מחיקת התרופה נכשלה");
             }
 
             if (result.affectedRows === 0) {
-                return res.status(404).send("Medication not found");
+                return res.status(404).send("התרופה לא נמצאה");
             }
 
-            res.send("Medication deleted successfully");
+            res.send("התרופה נמחקה בהצלחה");
         });
     });
 };
@@ -1152,5 +1211,5 @@ exports.testMailer = (req, res) => {
         "Test from MHF",
         "It worked"
     )
-    res.send("Mail sent");
+    res.send("המייל נשלח");
 };

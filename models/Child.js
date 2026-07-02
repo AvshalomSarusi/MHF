@@ -16,7 +16,7 @@ class Child {
     setName(name) {
 
         if (!formatName(name)) {
-            throw new Error("Invalid name format");
+            throw new Error("פורמט שם לא תקין");
         }
 
         this.#name = name;

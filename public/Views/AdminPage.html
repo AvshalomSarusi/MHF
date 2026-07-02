@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl" lang="he">
 
 <head>
     <meta name="mobile-web-app-capable" content="yes">
@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>MHF Admin</title>
+    <title>MHF ניהול</title>
     <link rel="stylesheet" href="/CSS/theme.css">
     <link rel="stylesheet" href="/CSS/admin.css">
 </head>
@@ -15,42 +15,42 @@
 <body class="admin">
 
     <div id="menuItem" class="menu-items">
-        <button onclick="location.href='/p'">Profile</button>
-        <button onclick="location.href='/ccp'">Relative card</button>
-        <button onclick="location.href='/e'">Edit</button>
-        <button onclick="location.href='/h'">Medication History</button>
-        <button onclick="location.href='/gm'">Guardian message</button>
-        <button onclick="location.href='/changePass'">Change password</button>
-        <button onclick="location.href='/logout'">Logout</button>
+        <button onclick="location.href='/p'">פרופיל</button>
+        <button onclick="location.href='/ccp'">כרטיס בן משפחה</button>
+        <button onclick="location.href='/e'">עריכה</button>
+        <button onclick="location.href='/h'">היסטוריית תרופות</button>
+        <button onclick="location.href='/gm'">הודעה לאפוטרופוס</button>
+        <button onclick="location.href='/changePass'">שינוי סיסמה</button>
+        <button onclick="location.href='/logout'">התנתקות</button>
     </div>
 
     <div class="admin-dashboard">
             <div class="info-card">
-                <h3>Total Users</h3>
+                <h3>סה&quot;כ משתמשים</h3>
                 <p id="totalUsers">0</p>
             </div>
         <div class="info-card">
-            <h3>Total Children</h3>
+            <h3>סה&quot;כ בני משפחה</h3>
             <p id="totalChildren">0</p>
         </div>
             <div class="info-card">
-                <h3>Total Guardians</h3>
+                <h3>סה&quot;כ אפוטרופוסים</h3>
                 <p id="totalGuardians">0</p>
             </div>
         <div class="info-card">
-            <h3>Total Medications</h3>
+            <h3>סה&quot;כ תרופות</h3>
             <p id="totalMedications">0</p>
         </div>
     </div>
-    
+
     <div class="admin-query-box">
-        <h2>Database Query Panel</h2>
-        <textarea id="sqlQueryInput" placeholder="Write your SQL query here..."></textarea>   
-        <button id="runQueryBtn">Run Query</button>
+        <h2>לוח שאילתות למסד הנתונים</h2>
+        <textarea id="sqlQueryInput" placeholder="כתבו כאן את שאילתת ה-SQL שלכם..."></textarea>
+        <button id="runQueryBtn">הרצת שאילתה</button>
         <div id="queryResultBox">
             <pre id="queryResult"></pre>
         </div>
-    
+
     </div>
     <script src="/JS/admin/adminPage.js"></script>
     <script src="/JS/menu.js"></script>

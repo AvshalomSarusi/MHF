@@ -41,7 +41,7 @@ function postData(url, data) {
 function loadUser() {
     getData("/getUser")
         .then(data => {
-            document.getElementById("hello").innerText = `Hello ${data.firstname} and Welcome to your profile.`;
+            document.getElementById("hello").innerText = `שלום ${data.firstname}, ברוכים הבאים לפרופיל שלך.`;
         })
         .catch(err => console.log("USER ERROR:", err));
 }
@@ -64,9 +64,9 @@ function openRelativeRow() {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-        <td><input type="text" placeholder="Relative name"></td>
-        <td><button onclick="saveChild(this)">Save</button></td>
-        <td><button onclick="closeRelativeRow(this)">Close</button></td>
+        <td><input type="text" placeholder="שם בן המשפחה"></td>
+        <td><button onclick="saveChild(this)">שמירה</button></td>
+        <td><button onclick="closeRelativeRow(this)">סגירה</button></td>
     `;
 
     relativeTableBody.appendChild(row);
@@ -77,7 +77,7 @@ window.saveChild = function (btn) {
     const name = row.children[0].children[0].value;
 
     if (!name) {
-        alert("Relative name is required");
+        alert("יש להזין שם בן משפחה");
         return;
     }
 
@@ -100,8 +100,8 @@ function loadChildren() {
             const childSelect1 = document.getElementById("childSelect1");
             const childSelect2 = document.getElementById("childSelect2");
 
-            childSelect1.innerHTML = `<option value="" disabled selected hidden>Select Relative</option>`;
-            childSelect2.innerHTML = `<option value="" disabled selected hidden>Select Relative</option>`;
+            childSelect1.innerHTML = `<option value="" disabled selected hidden>בחר בן משפחה</option>`;
+            childSelect2.innerHTML = `<option value="" disabled selected hidden>בחר בן משפחה</option>`;
 
             data.forEach(child => {
                 const option1 = document.createElement("option");
@@ -162,15 +162,15 @@ function openMedicationRow() {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-        <td><input type="text" placeholder="Medication name"></td>
+        <td><input type="text" placeholder="שם התרופה"></td>
         <td>
             <select>
-                <option value="1">Yes</option>
-                <option value="0">No</option>
+                <option value="1">כן</option>
+                <option value="0">לא</option>
             </select>
         </td>
-        <td><button onclick="saveMedication(this)">Save</button></td>
-        <td><button onclick="closeMedicationRow(this)">Close</button></td>
+        <td><button onclick="saveMedication(this)">שמירה</button></td>
+        <td><button onclick="closeMedicationRow(this)">סגירה</button></td>
     `;
 
     medicationTableBody.appendChild(row);
@@ -184,7 +184,7 @@ window.saveMedication = function (btn) {
     const antibiotic = row.children[1].children[0].value;
 
     if (!name) {
-        alert("Medication name is required");
+        alert("יש להזין שם תרופה");
         return;
     }
 
@@ -209,7 +209,7 @@ function loadMedications() {
         .then(data => {
             const medicationSelect = document.getElementById("medicationSelect");
 
-            medicationSelect.innerHTML = `<option value="" disabled selected hidden>Select Medication</option>`;
+            medicationSelect.innerHTML = `<option value="" disabled selected hidden>בחר תרופה</option>`;
 
             data.forEach(med => {
                 const option = document.createElement("option");
@@ -229,7 +229,7 @@ addMedicationBtn.addEventListener("click", () => {
     const timeToSend = document.getElementById("timeToSend").value;
 
     if (!child_id || !medication || !dosage || !timeToSend) {
-        alert("All fields are required");
+        alert("יש למלא את כל השדות");
         return;
     }
 
@@ -243,7 +243,7 @@ addMedicationBtn.addEventListener("click", () => {
             console.log("SERVER:", msg);
             alert(msg);
 
-            if (msg === "Medication added") {
+            if (msg === "התרופה נוספה") {
                 document.getElementById("childSelect1").selectedIndex = 0;
                 document.getElementById("medicationSelect").selectedIndex = 0;
                 document.getElementById("dosage").value = "";
@@ -263,7 +263,7 @@ addGuardianBtn.addEventListener("click", () => {
     const email = document.getElementById("guardianEmail").value;
 
     if (!name || !relationship || !email) {
-        alert("All guardian fields are required");
+        alert("יש למלא את כל שדות האפוטרופוס");
         return;
     }
 
@@ -276,7 +276,7 @@ addGuardianBtn.addEventListener("click", () => {
             console.log("GUARDIAN SERVER:", msg);
             alert(msg);
 
-            if (msg.trim() === "Guardian added successfully") {
+            if (msg.trim() === "האפוטרופוס נוסף בהצלחה") {
                 document.getElementById("guardianName").value = "";
                 document.getElementById("guardianRelationship").value = "";
                 document.getElementById("guardianEmail").value = "";
@@ -294,7 +294,7 @@ function loadGuardians() {
         .then(data => {
             const guardianSelect = document.getElementById("guardianChildSelect");
 
-            guardianSelect.innerHTML = `<option value="" disabled selected hidden>Select Guardian</option>`;
+            guardianSelect.innerHTML = `<option value="" disabled selected hidden>בחר אפוטרופוס</option>`;
 
             data.forEach(guardian => {
                 const option = document.createElement("option");
@@ -312,7 +312,7 @@ saveGuardianForRelativeBtn.addEventListener("click", () => {
     const guardian_id = document.getElementById("guardianChildSelect").value;
 
     if (!child_id || !guardian_id) {
-        alert("Please select relative and guardian");
+        alert("יש לבחור בן משפחה ואפוטרופוס");
         return;
     }
 

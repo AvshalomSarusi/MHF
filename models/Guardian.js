@@ -12,7 +12,7 @@ class Guardian {
         this.#userId = userId;
         this.#name = formatName(name);
         this.#relationship = formatName(relationship);
-        if (!validateEmail(email)) { throw new Error("Invalid email format"); }
+        if (!validateEmail(email)) { throw new Error("פורמט אימייל לא תקין"); }
         this.#email = email;
     }
     //GET
@@ -24,19 +24,19 @@ class Guardian {
     //SET
     setName(newName) {
         if (!newName) {
-            throw new Error("Name is must required");
+            throw new Error("יש להזין שם");
         }
         this.#name = formatName(newName);
     }
     setRelationship(relationship) {
         if (!relationship) {
-            throw new Error("Relationship is must required")
+            throw new Error("יש להזין קרבה")
         }
         this.#relationship = formatName(relationship);
     }
     setEmail(email) {
         if (!email) {
-            throw new Error("Email is must required");
+            throw new Error("יש להזין אימייל");
         }
         this.#email = email;
     }

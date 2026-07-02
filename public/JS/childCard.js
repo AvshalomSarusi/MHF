@@ -7,7 +7,7 @@ function logChildInfo(){
     const child_name = nameInput.value.trim();
 
     if(!child_name){
-        card.innerHTML = "Please enter child name";
+        card.innerHTML = "יש להזין שם בן משפחה";
         return;
     }
 
@@ -26,8 +26,8 @@ function logChildInfo(){
             card.innerHTML = `
             <div class="child-card">
                 <h3>${child.name}</h3>
-                <p><strong>Weight:</strong> ${child.weight} kg</p>
-                <p><strong>Height:</strong> ${child.height} cm</p>
+                <p><strong>משקל:</strong> ${child.weight} ק"ג</p>
+                <p><strong>גובה:</strong> ${child.height} ס"מ</p>
             </div>`;
 
         })

@@ -90,24 +90,22 @@ cron.schedule('* * * * *', () => {
 
                 const confirmLink = `http://localhost:3002/confirmMedication?token=${token}`;
 
+                // the confirmation button is built INTO the message (single HTML
+                // block) so the mail client doesn't split it off as "quoted text"
                 const msg = message.medicationReminder(
                     row.guardian_name,
                     row.child_name,
                     row.medication_name,
                     row.dosage,
-                    currentTime
+                    currentTime,
+                    confirmLink
                 );
-
-                const fullText = `
-                ${msg.text}
-
-                Click here to confirm that the child received the medication:
-                ${confirmLink}`;
 
                 sendMail(
                     row.guardian_email,
                     msg.subject,
-                    fullText
+                    msg.text,
+                    msg.html
                 );
 
                 console.log("Token created:", token);

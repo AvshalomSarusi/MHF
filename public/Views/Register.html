@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl" lang="he">
     <head>
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>MHF Register</title>
+        <title>MHF הרשמה</title>
         <link rel="stylesheet" href="/CSS/theme.css">
         <link rel="stylesheet" href="/CSS/LoginPage.css">
         <link rel="stylesheet" href="/CSS/Register.css">
@@ -15,17 +15,17 @@
         <main class="auth-shell">
             <section class="auth-card">
                 <span class="brand">My Healthy Family</span>
-                <h1><p>Create your account</p></h1>
-                <p class="auth-sub">We hope you enjoy what we have to offer.</p>
+                <h1><p>יצירת חשבון</p></h1>
+                <p class="auth-sub">אנו מקווים שתיהנו ממה שיש לנו להציע.</p>
 
                 <form method="POST" action="/register">
-                    <input name="name" id="name" type="text" placeholder="First name" required><br>
-                    <input name="last" id="ln" type="text" placeholder="Last name" required><br>
-                    <input name="email" id="em" type="email" placeholder="Email" required><br>
+                    <input name="name" id="name" type="text" placeholder="שם פרטי" required><br>
+                    <input name="last" id="ln" type="text" placeholder="שם משפחה" required><br>
+                    <input name="email" id="em" type="email" placeholder="אימייל" required><br>
                     <!--[!@#$%^&*.?][A-Z][a-z]*\d{6,8}-->
-                    <p>The password must start with one of: !@#$%^&amp;*.? &mdash; then one uppercase letter (A&ndash;Z). Lowercase letters (a&ndash;z) are optional, and it must end with 6 to 8 digits.</p>
-                    <input name="pass" id="pass" type="password" placeholder="Password" minlength="6" required><br>
-                    <button type="submit">Sign up</button>
+                    <p>הסיסמה חייבת להתחיל באחד מהתווים: !@#$%^&amp;*.? &mdash; ואחריו אות גדולה אחת (A&ndash;Z). אותיות קטנות (a&ndash;z) הן רשות, והסיסמה חייבת להסתיים ב&ndash;6 עד 8 ספרות.</p>
+                    <input name="pass" id="pass" type="password" placeholder="סיסמה" minlength="6" required><br>
+                    <button type="submit">הרשמה</button>
                 </form>
             </section>
         </main>

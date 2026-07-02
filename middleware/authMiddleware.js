@@ -17,7 +17,7 @@ function authMiddleware(req, res, next) {
     db.query(sql, (err, result) => {
         if (err) {
             console.log(err);
-            return res.status(500).send("DB Error");
+            return res.status(500).send("שגיאת מסד נתונים");
         }
 
         if (result.length === 0) {

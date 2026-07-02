@@ -1,7 +1,7 @@
 function adminMiddleware(req, res, next) {
 
     if (req.role !== 'admin') {
-        return res.status(403).send("Access denied");
+        return res.status(403).send("הגישה נדחתה");
     }
 
     next();

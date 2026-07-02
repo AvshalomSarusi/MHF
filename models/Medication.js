@@ -19,7 +19,7 @@ class Medication {
     //SET
     setName(newName) {
         if (!newName) {
-            throw new Error("Name is must required")
+            throw new Error("יש להזין שם")
         }
         this.#name = formatName(newName);
     }
@@ -30,7 +30,7 @@ class Medication {
             isAntibiotic !== 0 &&
             isAntibiotic !== 1
         ) {
-            throw new Error("Antibiotic values is must be: true/false or 1/0");
+            throw new Error("ערך האנטיביוטיקה חייב להיות: true/false או 1/0");
         }
         this.#antibiotic = isAntibiotic === true || isAntibiotic === 1 ? 1 : 0;
     }

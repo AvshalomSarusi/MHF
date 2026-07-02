@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl" lang="he">
 
 <head>
     <meta name="mobile-web-app-capable" content="yes">
@@ -7,92 +7,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>MHF Edit</title>
+    <title>MHF עריכה</title>
     <link rel="stylesheet" href="/CSS/theme.css">
     <link rel="stylesheet" href="/CSS/edit.css">
 </head>
 
 <body>
+    <script>try{if(document.cookie.split('; ').indexOf('mhf_role=admin')>-1){document.body.classList.add('admin')}}catch(e){}</script>
     <a class="brand app-brand" href="/p">My Healthy Family</a>
-    <h2>Edit page</h2>
+    <h2>עמוד עריכה</h2>
     <!--טבלת עריכה ומחיקת מסימות-->
     <div class="menu">
-        <button id="menueBtn">Menu</button>
+        <button id="menueBtn">תפריט</button>
 
         <div id="menuItem" class="menu-items">
-            <button onclick="location.href='/p'">Profile</button>
-            <button onclick="location.href='/ccp'">Relative card</button>
-            <button onclick="location.href='/h'">Medication History</button>
-            <button onclick="location.href='/gm'">Guardian message</button>
-            <button onclick="location.href='/changePass'">Change password</button>
-            <button onclick="location.href='/logout'">Logout</button>
+            <button onclick="location.href='/p'">פרופיל</button>
+            <button onclick="location.href='/ccp'">כרטיס בן משפחה</button>
+            <button onclick="location.href='/h'">היסטוריית תרופות</button>
+            <button onclick="location.href='/gm'">הודעה לאפוטרופוס</button>
+            <button onclick="location.href='/changePass'">שינוי סיסמה</button>
+            <button onclick="location.href='/logout'">התנתקות</button>
         </div>
     </div>
     <div id="tableBox">
         <p>
-            You can change the dosage and medication time here by clicking the Edit button.<br>
-            You can also delete the task by clicking the Delete button.
+            כאן ניתן לשנות את המינון ואת שעת התרופה בלחיצה על כפתור העריכה.<br>
+            ניתן גם למחוק את המשימה בלחיצה על כפתור המחיקה.
         </p>
         <table border="1">
             <tr>
-                <th>Relative</th>
-                <th>Medication</th>
-                <th>Dosage</th>
-                <th>Time to get</th>
-                <th>Guardian</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th>בן משפחה</th>
+                <th>תרופה</th>
+                <th>מינון</th>
+                <th>שעת נטילה</th>
+                <th>אפוטרופוס</th>
+                <th>עריכה</th>
+                <th>מחיקה</th>
             </tr>
             <tbody id="logsTableBody"></tbody>
         </table>
-    </div>   
+    </div>
     <hr>
-    <h2>Update information and data</h2>
-    <p>You can update the selected relative's weight and height here.</p>
+    <h2>עדכון מידע ונתונים</h2>
+    <p>כאן ניתן לעדכן את המשקל והגובה של בן המשפחה שנבחר.</p>
 
     <div id="updateChildDataActions">
     <select id="childToUpdate">
-        <option value="" disabled selected hidden>Select Relative</option>
+        <option value="" disabled selected hidden>בחר בן משפחה</option>
     </select>
-    <input id="childWeight" type="number" step="0.01" placeholder="Weight kg">
-    <input id="childHeight" type="number" step="0.01" placeholder="Height cm">
+    <input id="childWeight" type="number" step="0.01" placeholder="משקל בק&quot;ג">
+    <input id="childHeight" type="number" step="0.01" placeholder="גובה בס&quot;מ">
 
-    <button onclick="updateRelativeData()">Update Child</button>
+    <button onclick="updateRelativeData()">עדכון בן משפחה</button>
     </div>
 
     <p id="updateChildMsg"></p>
 </div>
     <hr>
-     <h2>Delete information and data</h2>
-    
+     <h2>מחיקת מידע ונתונים</h2>
+
     <!--עריכת גובהה ומשקל לבן משפחה-->
     <!--מחיקת שמרטפים-->
     <div id="deleteGuardianBox">
-        <p>Delete guardian</p>
-    
+        <p>מחיקת אפוטרופוס</p>
+
         <select id="guardianToDelete">
-            <option value="" disabled selected hidden>Select Guardian</option>
+            <option value="" disabled selected hidden>בחר אפוטרופוס</option>
         </select>
-    
-        <button onclick="deleteGuardian()">Delete Guardian</button>
+
+        <button onclick="deleteGuardian()">מחיקת אפוטרופוס</button>
     </div>
 
     <!--בחירת תרופה ומחיקתה-->
     <div id="deleteMedicationBox">
-        <p>Delete medication</p>
+        <p>מחיקת תרופה</p>
         <select id="medicationToDelete">
-            <option value="" disabled selected hidden>Select Medication</option>
+            <option value="" disabled selected hidden>בחר תרופה</option>
         </select>
-        <button onclick="deleteMedication()">Delete Medication</button>
+        <button onclick="deleteMedication()">מחיקת תרופה</button>
     </div>
 
     <!--מחיקת בן משפחה-->
     <div id="deleteRelativeBox">
-        <p>Delete relative</p>
+        <p>מחיקת בן משפחה</p>
         <select id="relativeToDelete">
-            <option value="" disabled selected hidden>Select Relative</option>
+            <option value="" disabled selected hidden>בחר בן משפחה</option>
         </select>
-        <button onclick="deleteRelative()">Delete Relative</button>
+        <button onclick="deleteRelative()">מחיקת בן משפחה</button>
     </div>
 
     <script src="/JS/edit.js"></script>

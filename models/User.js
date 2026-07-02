@@ -11,9 +11,9 @@ class User {
     constructor(firstname, lastname, password, email) {
         this.#firstname = formatName(firstname);
         this.#lastname = formatName(lastname);
-        if (!validatePassword(password)) { throw new Error("Invalid password format"); }
+        if (!validatePassword(password)) { throw new Error("פורמט סיסמה לא תקין"); }
         this.#password = password;
-        if (!validateEmail(email)) { throw new Error("Invalid email format"); }
+        if (!validateEmail(email)) { throw new Error("פורמט אימייל לא תקין"); }
         this.#email = email;
     }
 
@@ -33,7 +33,7 @@ class User {
     setPassword(newPassword) {
 
         if (!validatePassword(newPassword)) {
-            throw new Error("Invalid password format");
+            throw new Error("פורמט סיסמה לא תקין");
         }
 
         this.#password = newPassword;
@@ -41,7 +41,7 @@ class User {
     setEmail(newEmail) {
 
         if (!validateEmail(newEmail)) {
-            throw new Error("invalid email format");
+            throw new Error("פורמט אימייל לא תקין");
         }
 
         this.#email = newEmail.toLowerCase();

@@ -1,6 +1,6 @@
 function formatName(name){
     if(!name){
-        throw new Error("Name is required");
+        throw new Error("יש להזין שם");
     }
     
     name = name.trim();

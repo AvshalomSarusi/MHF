@@ -29,9 +29,9 @@ function getLogs() {
                     <td>${row.medication_name}</td>
                     <td>${row.dosage}</td>
                     <td>${row.scheduled_time}</td>
-                    <td>${row.guardian_name || "No Guardian"}</td>
-                    <td><button onclick="editLog(${row.id}, '${row.dosage}', '${row.scheduled_time}')">Edit</button></td>
-                    <td><button onclick="deleteLog(${row.id})">Delete</button></td>
+                    <td>${row.guardian_name || "אין אפוטרופוס"}</td>
+                    <td><button onclick="editLog(${row.id}, '${row.dosage}', '${row.scheduled_time}')">עריכה</button></td>
+                    <td><button onclick="deleteLog(${row.id})">מחיקה</button></td>
                 `;
 
                 table.appendChild(tr);
@@ -47,7 +47,7 @@ function getLogs() {
 function deleteLog(id) {
 
     if (!id) {
-        alert("Invalid record ID");
+        alert("מזהה רשומה לא תקין");
         return;
     }
 
@@ -66,11 +66,11 @@ function deleteLog(id) {
 
 function editLog(id, currentDosage, currentTime) {
 
-    const newDosage = prompt("Enter new dosage:", currentDosage);
+    const newDosage = prompt("הזינו מינון חדש:", currentDosage);
 
     if (newDosage === null) return;
 
-    const newTime = prompt("Enter new time (HH:MM:SS):", currentTime);
+    const newTime = prompt("הזינו שעה חדשה (HH:MM:SS):", currentTime);
 
     if (newTime === null) return;
 
@@ -111,7 +111,7 @@ function loadGuardianForDelete() {
 
             const select = document.getElementById("guardianToDelete");
 
-            select.innerHTML = `<option value ="" disabled selected hidden>Select Guardian</option>`;
+            select.innerHTML = `<option value ="" disabled selected hidden>בחר אפוטרופוס</option>`;
 
             data.forEach(guardian => {
 
@@ -133,7 +133,7 @@ function deleteGuardian() {
     const guardianID = document.getElementById("guardianToDelete").value;
 
     if (!guardianID) {
-        alert("Please select guardian");
+        alert("יש לבחור אפוטרופוס");
         return;
     }
 
@@ -162,7 +162,7 @@ function loadMedicationsForDelete() {
 
             const select = document.getElementById("medicationToDelete");
 
-            select.innerHTML = `<option value = "" disabled selected hidden>Select Madication</option>`;
+            select.innerHTML = `<option value = "" disabled selected hidden>בחר תרופה</option>`;
 
             data.forEach(med => {
                 const option = document.createElement("option");
@@ -183,7 +183,7 @@ function deleteMedication() {
     const medicationId = document.getElementById("medicationToDelete").value;
 
     if (!medicationId) {
-        alert("Please select medication");
+        alert("יש לבחור תרופה");
         return;
     }
 
@@ -211,7 +211,7 @@ function loadRelativeForDelete() {
 
             const select = document.getElementById("relativeToDelete");
 
-            select.innerHTML = `<option value="" disabled selected hidden>Select Relative</option>`;
+            select.innerHTML = `<option value="" disabled selected hidden>בחר בן משפחה</option>`;
 
             data.forEach(rel => {
 
@@ -233,7 +233,7 @@ function deleteRelative() {
     const relativeId = document.getElementById("relativeToDelete").value;
 
     if (!relativeId) {
-        alert("Please select relative");
+        alert("יש לבחור בן משפחה");
         return;
     }
 
@@ -262,7 +262,7 @@ function loadRelativeForUpdate(){
         const select = document.getElementById("childToUpdate");
 
         select.innerHTML =`
-        <option value="" disabled selected hidden>Select Relative</option>`;
+        <option value="" disabled selected hidden>בחר בן משפחה</option>`;
 
         data.forEach(child =>{
 
@@ -291,12 +291,12 @@ function updateRelativeData() {
     const height = heightInput.value;
 
     if (!childId) {
-        msg.textContent = "Please select relative";
+        msg.textContent = "יש לבחור בן משפחה";
         return;
     }
 
     if (!weight || !height) {
-        msg.textContent = "Please enter weight and height";
+        msg.textContent = "יש להזין משקל וגובה";
         return;
     }
 
@@ -317,7 +317,7 @@ function updateRelativeData() {
             return res.text();
         })
         .then(data => {
-            alert("Child data updated successfully");
+            alert("נתוני בן המשפחה עודכנו בהצלחה");
 
             childSelect.value = "";
             weightInput.value = "";

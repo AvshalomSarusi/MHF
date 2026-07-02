@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl" lang="he">
 
 <head>
     <meta name="mobile-web-app-capable" content="yes">
@@ -7,31 +7,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>MHF Relative info</title>
+    <title>MHF כרטיס בן משפחה</title>
     <link rel="stylesheet" href="/CSS/theme.css">
     <link rel="stylesheet" href="/CSS/chileCard.css">
 </head>
 
 <body>
+    <script>try{if(document.cookie.split('; ').indexOf('mhf_role=admin')>-1){document.body.classList.add('admin')}}catch(e){}</script>
     <a class="brand app-brand" href="/p">My Healthy Family</a>
-    <h2>Relative info page</h2>
+    <h2>כרטיס בן משפחה</h2>
     <!--טבלת עריכה ומחיקת מסימות-->
     <div class="menu">
-        <button id="menueBtn">Menu</button>
+        <button id="menueBtn">תפריט</button>
 
         <div id="menuItem" class="menu-items">
-            <button onclick="location.href='/p'">Profile</button>
-            <button onclick="location.href='/e'">Edit</button>
-            <button onclick="location.href='/h'">Medication History</button>
-            <button onclick="location.href='/gm'">Guardian message</button>
-            <button onclick="location.href='/changePass'">Change password</button>
-            <button onclick="location.href='/logout'">Logout</button>
+            <button onclick="location.href='/p'">פרופיל</button>
+            <button onclick="location.href='/e'">עריכה</button>
+            <button onclick="location.href='/h'">היסטוריית תרופות</button>
+            <button onclick="location.href='/gm'">הודעה לאפוטרופוס</button>
+            <button onclick="location.href='/changePass'">שינוי סיסמה</button>
+            <button onclick="location.href='/logout'">התנתקות</button>
         </div><br>
     </div>
 
         <div class="child-search-box">
-            <input id="name" type="text" placeholder="name of relative">
-            <button id="SearchBtn">Search</button>
+            <input id="name" type="text" placeholder="שם בן המשפחה">
+            <button id="SearchBtn">חיפוש</button>
         </div>
         <div id="card"></div>
 
