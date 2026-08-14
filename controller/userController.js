@@ -311,55 +311,24 @@ exports.deleteLog = (req, res) => {
         return res.status(401).send("לא מחוברים.");
     }
 
-    const getChildSql = `
-        SELECT child_id
-        FROM linkingtable
+    const deleteLogSql = `
+        DELETE FROM linkingtable
         WHERE id = '${logId}'
         AND user_id = '${userId}'
     `;
 
-    db.query(getChildSql, (err, result) => {
+    db.query(deleteLogSql, (err, result) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).send("שגיאת מסד נתונים");
+            return res.status(500).send("מחיקת המשימה נכשלה");
         }
 
-        if (result.length === 0) {
+        if (result.affectedRows === 0) {
             return res.status(404).send("המשימה לא נמצאה");
         }
 
-        const childId = result[0].child_id;
-
-        const deleteLogSql = `
-            DELETE FROM linkingtable
-            WHERE id = '${logId}'
-            AND user_id = '${userId}'
-        `;
-
-        db.query(deleteLogSql, (err2) => {
-
-            if (err2) {
-                console.log(err2);
-                return res.status(500).send("מחיקת המשימה נכשלה");
-            }
-
-            const deleteGuardianLinkSql = `
-                DELETE FROM child_guardian
-                WHERE child_id = '${childId}'
-                AND user_id = '${userId}'
-            `;
-
-            db.query(deleteGuardianLinkSql, (err3) => {
-
-                if (err3) {
-                    console.log(err3);
-                    return res.status(500).send("מחיקת קישור האפוטרופוס נכשלה");
-                }
-
-                res.send("המשימה נמחקה בהצלחה");
-            });
-        });
+        res.send("המשימה נמחקה בהצלחה");
     });
 };
 
