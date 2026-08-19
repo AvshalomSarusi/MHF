@@ -89,6 +89,7 @@ router.post('/addGuardian', authMiddleware, userController.addGuardian);
 router.get('/getGuardian', authMiddleware, userController.getGuardian);
 router.post('/addChildGuardian', authMiddleware, userController.addChildGuardian);
 router.delete('/deleteGuardian/:id', authMiddleware, userController.deleteGuardian);
+router.delete('/guardianCancellation/:rid/:gid',authMiddleware,userController.guardianCancellation);
 
 //MEDICATION
 router.post('/addMedication', authMiddleware, userController.addMedication);

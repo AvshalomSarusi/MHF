@@ -5,6 +5,8 @@ window.onload = function () {
     loadGuardianForDelete();
     loadRelativeForDelete();
     loadRelativeForUpdate();
+    loadRelativeForGuardianCancellation();
+    loadGuardianForGuardianCancellation();
 };
 window.closeMenu = function (btn) {
     logsTableBody.style.display = "none";
@@ -327,4 +329,106 @@ function updateRelativeData() {
         .catch(err => {
             msg.textContent = err.message;
         });
+};
+
+function loadRelativeForGuardianCancellation() {
+
+    fetch('/getChildren')
+        .then(res => res.json())
+        .then(data => {
+
+            const select = document.getElementById("selectRToGuardianCancellation");
+
+            select.innerHTML = `
+            <option value="" disabled selected hidden>בחר בן משפחה</option>`;
+
+            data.forEach(child => {
+
+                const option = document.createElement("option");
+
+                option.value = child.id;
+                option.textContent = child.name;
+
+                select.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.log("Load relatives for cancellation error:", err);
+        });
+};
+
+function loadGuardianForGuardianCancellation() {
+
+    fetch('/getGuardian')
+        .then(res => res.json())
+        .then(data => {
+
+            const select = document.getElementById("selectGToGuardianCancellation");
+
+            select.innerHTML = `
+            <option value="" disabled selected hidden>בחר אפוטרופוס</option>`;
+
+            data.forEach(guardian => {
+
+                const option = document.createElement("option");
+
+                option.value = guardian.id;
+                option.textContent = guardian.name;
+
+                select.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.log("Load guardians for cancellation error:", err);
+        });
+};
+
+function guardianCancellation() {
+
+    const relativeSelect = document.getElementById('selectRToGuardianCancellation');
+    const guardianSelect = document.getElementById('selectGToGuardianCancellation');
+    const msg = document.getElementById('guardianCancellationMsg');
+
+    const relativeId = relativeSelect.value;
+    const guardianId = guardianSelect.value;
+
+    msg.classList.remove("ok", "error");
+
+    if (!relativeId) {
+        msg.textContent = "יש לבחור בן משפחה";
+        msg.classList.add("error");
+        return;
+    }
+
+    if (!guardianId) {
+        msg.textContent = "יש לבחור אפוטרופוס";
+        msg.classList.add("error");
+        return;
+    }
+
+    fetch(`/guardianCancellation/${relativeId}/${guardianId}`, {
+        method: 'DELETE'
+    })
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(message => {
+                    throw new Error(message);
+                });
+            }
+
+            return res.text();
+        })
+        .then(data => {
+
+            msg.textContent = data;
+            msg.classList.add("ok");
+
+            relativeSelect.value = "";
+            guardianSelect.value = "";
+        })
+        .catch(err => {
+            msg.textContent = err.message;
+            msg.classList.add("error");
+        });
+        getLogs();
 };

@@ -38,6 +38,60 @@
     color: var(--accent-deep);
 }
 
+/* ---- cancel a guardian assignment ---- */
+#guardianCancellation {
+    width: min(92%, 760px);
+    margin: 22px auto 4px;
+    padding: 22px 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+#guardianCancellation p {
+    flex: 1 1 100%;
+    margin: 0 0 4px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--ink);
+}
+
+#guardianCancellation select {
+    flex: 1 1 200px;
+    min-width: 170px;
+}
+
+#guardianCancellation button {
+    flex: 0 0 auto;
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+#guardianCancellation button:hover {
+    background: #97302f;
+    border-color: #97302f;
+}
+
+#guardianCancellationMsg {
+    text-align: center;
+    margin: 14px auto 0;
+    font-weight: 600;
+    min-height: 1.2em;
+    color: var(--accent-deep);
+}
+
+#guardianCancellationMsg.ok { color: var(--primary-deep); }
+#guardianCancellationMsg.error { color: var(--danger); }
+
 /* ---- delete boxes ---- */
 #deleteGuardianBox,
 #deleteMedicationBox,
@@ -94,6 +148,7 @@
 
 @media (max-width: 720px) {
     #updateChildDataActions,
+    #guardianCancellation,
     #deleteGuardianBox,
     #deleteMedicationBox,
     #deleteRelativeBox { flex-direction: column; align-items: stretch; }
@@ -101,6 +156,8 @@
     #updateChildDataActions select,
     #updateChildDataActions input,
     #updateChildDataActions button,
+    #guardianCancellation select,
+    #guardianCancellation button,
     #deleteGuardianBox select,
     #deleteMedicationBox select,
     #deleteRelativeBox select,

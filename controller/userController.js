@@ -253,10 +253,9 @@ exports.updateLog = (req, res) => {
     const sql = `
         UPDATE linkingtable
         SET dosage = '${dosage}',
-            scheduled_time = '${scheduled_time}'
+        scheduled_time = '${scheduled_time}'
         WHERE id = '${logId}'
-        AND user_id = '${userId}'
-    `;
+        AND user_id = '${userId}'`;
 
     db.query(sql, (err, result) => {
 
@@ -283,7 +282,7 @@ exports.getUser = (req, res) => {
     }
 
     const sql =
-        `SELECT firstname
+    `SELECT firstname
     FROM users
     WHERE id = '${userId}'`;
 
@@ -734,10 +733,50 @@ exports.deleteGuardian = (req, res) => {
     });
 };
 
+exports.guardianCancellation=(req,res)=>{
+
+    const userId = req.userId;
+    const rid = req.params.rid;
+    const gid = req.params.gid;
+
+    if(!userId){
+        return res.status(401).send("לא מחוברים");
+    }
+
+    if(!rid){
+        return res.status(400).send("חסר בן משפחה");
+    }
+
+    if(!gid){
+        return res.status(400).send("חסר אפוטרופוס");
+    }
+
+    const deleteSql =`
+    DELETE
+    FROM child_guardian
+    WHERE guardian_id = ?
+    AND child_id = ? 
+    AND user_id = ?`;
+
+    db.query(deleteSql,[gid,rid,userId],(err,result)=>{
+
+        if(err){
+            console.log(err);
+            return res.status(500).send("שגיאת מסד נתונים");
+        }
+
+        if(result.affectedRows === 0 ){
+            return res.status(404).send("לא נמצאו נתונים תואמים");
+        }
+
+        res.send("שיוך האפוטרופוס בוטל בהצלחה");
+    })
+};
+
 //LOGS
 exports.getLogs = (req, res) => {
 
-    const userId = req.cookies.mhf_user;
+    const userId = req.userId;
 
     if (!userId) {
         return res.status(401).send("לא מחוברים.");
@@ -1033,21 +1072,39 @@ exports.addMedication = (req, res) => {
 
     const medication_id = medication;
 
-    const insertLog = `
+    const checkSql = `
+    SELECT * 
+    FROM linkingtable
+    WHERE user_id = ? AND child_id = ? AND medication_id = ? AND scheduled_time = ?
+    LIMIT 1`;
+
+    db.query(checkSql,[userId,child_id,medication_id,timeToSend],(err,result)=>{
+
+        if(err){
+            console.log("check error",err);
+            return res.status(500).send("שגיאת בדיקה");
+        }
+
+        if(result.length > 0){
+            return res.status(409).send("המשימה כבר קיימת");
+        }
+
+        const insertLog = `
         INSERT INTO linkingtable
         (user_id, child_id, medication_id, dosage, scheduled_time)
-        VALUES (${userId}, ${child_id}, ${medication_id},'${dosage}', '${timeToSend}')
-    `;
+        VALUES (${userId}, ${child_id}, ${medication_id},'${dosage}', '${timeToSend}')`;
 
-    db.query(insertLog, (err) => {
+        db.query(insertLog, (err) => {
 
         if (err) {
             console.log("INSERT LOG ERROR:", err);
             return res.status(500).send("שגיאת הוספה");
         }
+        res.send("המשימה נוספה");
+    })
 
-        res.send("התרופה נוספה");
     });
+
 };
 
 exports.getMedications = (req, res) => {

@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <script>try{if(document.cookie.split('; ').indexOf('mhf_role=admin')>-1){document.body.classList.add('admin')}}catch(e){}</script>
+    <script>try { if (document.cookie.split('; ').indexOf('mhf_role=admin') > -1) { document.body.classList.add('admin') } } catch (e) { }</script>
     <a class="brand app-brand" href="/p">My Healthy Family</a>
     <h2>עמוד עריכה</h2>
     <!--טבלת עריכה ומחיקת מסימות-->
@@ -29,6 +29,7 @@
             <button onclick="location.href='/logout'">התנתקות</button>
         </div>
     </div>
+
     <div id="tableBox">
         <p>
             כאן ניתן לשנות את המינון ואת שעת התרופה בלחיצה על כפתור העריכה.<br>
@@ -47,24 +48,39 @@
             <tbody id="logsTableBody"></tbody>
         </table>
     </div>
+
     <hr>
-    <h2>עדכון מידע ונתונים</h2>
-    <p>כאן ניתן לעדכן את המשקל והגובה של בן המשפחה שנבחר.</p>
+    
+        <h2>עדכון מידע ונתונים</h2>
+        <p>כאן ניתן לעדכן את המשקל והגובה של בן המשפחה שנבחר.</p>
 
-    <div id="updateChildDataActions">
-    <select id="childToUpdate">
-        <option value="" disabled selected hidden>בחר בן משפחה</option>
-    </select>
-    <input id="childWeight" type="number" step="0.01" placeholder="משקל בק&quot;ג">
-    <input id="childHeight" type="number" step="0.01" placeholder="גובה בס&quot;מ">
+            <div id="updateChildDataActions">
+                <select id="childToUpdate">
+                    <option value="" disabled selected hidden>בחר בן משפחה</option>
+                </select>
+                <input id="childWeight" type="number" step="0.01" placeholder="משקל בק&quot;ג">
+                <input id="childHeight" type="number" step="0.01" placeholder="גובה בס&quot;מ">
+            
+                <button onclick="updateRelativeData()">עדכון בן משפחה</button>
+            </div>
+        <p id="updateChildMsg"></p>
 
-    <button onclick="updateRelativeData()">עדכון בן משפחה</button>
-    </div>
+        <div id="guardianCancellation">
+            <p>כאן ניתן לבטל אפוטרופוס משמירה על בן משפחה</p>
 
-    <p id="updateChildMsg"></p>
-</div>
+            <select id="selectRToGuardianCancellation">
+                <option value="" disabled selected hidden>בחר בן משפחה</option>
+            </select>
+
+            <select id="selectGToGuardianCancellation">
+                <option value="" disabled selected hidden>בחר אפוטרופוס</option>
+            </select>
+
+            <button onclick="guardianCancellation()">ביטול שיוך</button>
+        </div>
+        <p id="guardianCancellationMsg"></p>
     <hr>
-     <h2>מחיקת מידע ונתונים</h2>
+    <h2>מחיקת מידע ונתונים</h2>
 
     <!--עריכת גובהה ומשקל לבן משפחה-->
     <!--מחיקת שמרטפים-->
