@@ -1063,46 +1063,51 @@ exports.addMedication = (req, res) => {
     if (!userId) {
         return res.status(401).send("לא מחוברים");
     }
-    if (dosage.length <= 0) {
-        return res.status(400).send("המינון חייב להיות גדול מ-0");
-    }
+
     if (!child_id || !medication || !dosage || !timeToSend) {
         return res.status(400).send("יש למלא את כל השדות");
+    }
+
+    if (Number(dosage) <= 0) {
+        return res.status(400).send("המינון חייב להיות גדול מ-0");
     }
 
     const medication_id = medication;
 
     const checkSql = `
-    SELECT * 
+    SELECT id
     FROM linkingtable
-    WHERE user_id = ? AND child_id = ? AND medication_id = ? AND scheduled_time = ?
+    WHERE user_id = ?
+    AND child_id = ?
+    AND medication_id = ?
+    AND scheduled_time = ?
     LIMIT 1`;
 
-    db.query(checkSql,[userId,child_id,medication_id,timeToSend],(err,result)=>{
+    db.query(checkSql, [userId, child_id, medication_id, timeToSend], (err, result) => {
 
-        if(err){
-            console.log("check error",err);
+        if (err) {
+            console.log("check error", err);
             return res.status(500).send("שגיאת בדיקה");
         }
 
-        if(result.length > 0){
-            return res.status(409).send("המשימה כבר קיימת");
+        if (result.length > 0) {
+            return res.status(409).send("בן המשפחה כבר מקבל את התרופה הזו בשעה זו");
         }
 
         const insertLog = `
         INSERT INTO linkingtable
         (user_id, child_id, medication_id, dosage, scheduled_time)
-        VALUES (${userId}, ${child_id}, ${medication_id},'${dosage}', '${timeToSend}')`;
+        VALUES (?, ?, ?, ?, ?)`;
 
-        db.query(insertLog, (err) => {
+        db.query(insertLog, [userId, child_id, medication_id, dosage, timeToSend], (err) => {
 
-        if (err) {
-            console.log("INSERT LOG ERROR:", err);
-            return res.status(500).send("שגיאת הוספה");
-        }
-        res.send("המשימה נוספה");
-    })
+            if (err) {
+                console.log("INSERT LOG ERROR:", err);
+                return res.status(500).send("שגיאת הוספה");
+            }
 
+            res.send("המשימה נוספה");
+        });
     });
 
 };

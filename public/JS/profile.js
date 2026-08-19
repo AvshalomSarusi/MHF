@@ -34,7 +34,16 @@ function postData(url, data) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
-    }).then(res => res.text());
+    }).then(res => {
+
+        if (!res.ok) {
+            return res.text().then(message => {
+                throw new Error(message);
+            });
+        }
+
+        return res.text();
+    });
 }
 
 // USER
@@ -89,7 +98,10 @@ window.saveChild = function (btn) {
             closeRelativeRow(btn);
             loadChildren();
         })
-        .catch(err => console.log("ADD CHILD ERROR:", err));
+        .catch(err => {
+            console.log("ADD CHILD ERROR:", err);
+            alert(err.message);
+        });
 };
 
 function loadChildren() {
@@ -201,6 +213,7 @@ window.saveMedication = function (btn) {
         })
         .catch(err => {
             console.log("SAVE MEDICATION ERROR:", err);
+            alert(err.message);
         });
 };
 
@@ -243,16 +256,17 @@ addMedicationBtn.addEventListener("click", () => {
             console.log("SERVER:", msg);
             alert(msg);
 
-            if (msg === "התרופה נוספה") {
-                document.getElementById("childSelect1").selectedIndex = 0;
-                document.getElementById("medicationSelect").selectedIndex = 0;
-                document.getElementById("dosage").value = "";
-                document.getElementById("timeToSend").value = "";
+            document.getElementById("childSelect1").selectedIndex = 0;
+            document.getElementById("medicationSelect").selectedIndex = 0;
+            document.getElementById("dosage").value = "";
+            document.getElementById("timeToSend").value = "";
 
-                loadLogs();
-            }
+            loadLogs();
         })
-        .catch(err => console.log("ADD MEDICATION ERROR:", err));
+        .catch(err => {
+            console.log("ADD MEDICATION ERROR:", err);
+            alert(err.message);
+        });
 });
 
 // GUARDIANS
@@ -276,16 +290,15 @@ addGuardianBtn.addEventListener("click", () => {
             console.log("GUARDIAN SERVER:", msg);
             alert(msg);
 
-            if (msg.trim() === "האפוטרופוס נוסף בהצלחה") {
-                document.getElementById("guardianName").value = "";
-                document.getElementById("guardianRelationship").value = "";
-                document.getElementById("guardianEmail").value = "";
+            document.getElementById("guardianName").value = "";
+            document.getElementById("guardianRelationship").value = "";
+            document.getElementById("guardianEmail").value = "";
 
-                loadGuardians();
-            }
+            loadGuardians();
         })
         .catch(err => {
-            console.log("GUARDIAN ERROR:", err)
+            console.log("GUARDIAN ERROR:", err);
+            alert(err.message);
         });
 });
 
@@ -324,7 +337,10 @@ saveGuardianForRelativeBtn.addEventListener("click", () => {
             alert(msg);
             loadLogs();
         })
-        .catch(err => console.log("CHILD GUARDIAN ERROR:", err));
+        .catch(err => {
+            console.log("CHILD GUARDIAN ERROR:", err);
+            alert(err.message);
+        });
 });
 
 // CLOSE BUTTONS
